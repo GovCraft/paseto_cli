@@ -5,7 +5,7 @@ Welcome to PASETO CLI - Your Swiss Army Knife for PASETO v4.local Tokens!
 ![PASETO CLI Logo](https://via.placeholder.com/150x150.png?text=PASETO+CLI)
 
 [![Build Status](https://img.shields.io/travis/Govcraft/paseto-cli/master.svg?style=flat-square)](https://travis-ci.org/Govcraft/paseto-cli)
-[![License](https://img.shields.io/badge/license-GPL--3.0-blue.svg?style=flat-square)](https://github.com/Govcraft/paseto-cli/blob/master/LICENSE)
+[![License](https://img.shields.io/badge/license-GPL--3.0-blue.svg?style=flat-square)](https://github.com/GovCraft/paseto_cli/blob/main/LICENSE)
 [![Crates.io](https://img.shields.io/crates/v/paseto_cli.svg?style=flat-square)](https://crates.io/crates/paseto_cli)
 
 ## 🚀 Quick Start
