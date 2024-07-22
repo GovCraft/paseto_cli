@@ -223,6 +223,7 @@ enum CustomError {
     #[error(transparent)]
     SerdeJsonError(#[from] serde_json::Error),
 }
+
 fn output_result(format: &OutputFormat, result: Result<String, CustomError>) -> anyhow::Result<()> {
     match result {
         Ok(output) => {
@@ -295,6 +296,7 @@ fn output_result(format: &OutputFormat, result: Result<String, CustomError>) -> 
     }
     Ok(())
 }
+
 fn color_print_token(stdout: &mut StandardStream, token: &str) -> anyhow::Result<()> {
     let parts: Vec<&str> = token.split('.').collect();
     if parts.len() != 3 {
@@ -328,6 +330,7 @@ fn color_print_token(stdout: &mut StandardStream, token: &str) -> anyhow::Result
     stdout.reset()?;
     Ok(())
 }
+
 fn read_key_from_stdin() -> anyhow::Result<String> {
     let mut buffer = String::new();
     io::stdin().read_to_string(&mut buffer)?;
@@ -343,6 +346,7 @@ struct PasetoClaims<'a> {
     not_before: &'a Option<String>,
     issued_at: &'a Option<String>,
 }
+
 fn generate_token(
     key: &str,
     claims: PasetoClaims,
@@ -476,6 +480,7 @@ fn parse_key_val(s: &str) -> Result<(String, String), String> {
         None => Err(format!("Invalid format '{}': expected KEY=value", s)),
     }
 }
+
 fn parse_expiration(exp: &str) -> anyhow::Result<OffsetDateTime> {
     if exp.ends_with('s') || exp.ends_with('m') || exp.ends_with('h') || exp.ends_with('d') {
         let now = OffsetDateTime::now_utc();
