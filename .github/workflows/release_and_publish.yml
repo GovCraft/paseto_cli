@@ -86,13 +86,6 @@ jobs:
           fi
         shell: bash
 
-      - name: Download existing artifact
-        if: env.artifact-exists == 'true'
-        run: |
-          curl -L -o artifact.zip "${{ env.artifact_download_url }}"
-          unzip artifact.zip -d artifact
-        shell: bash
-
       - uses: actions/checkout@v4
       - name: Install Rust
         if: env.artifact-exists == 'false'
