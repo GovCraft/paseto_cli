@@ -146,11 +146,11 @@ The output format is determined by the `--format` option:
 * rusty_paseto Documentation: https://docs.rs/rusty_paseto/
 
 ## AUTHOR
-Written by Roland Rodriguez <roland@govcraft.ai>
+Written by [Roland Rodriguez](mailto:roland@govcraft.ai) <roland@govcraft.ai>
 
 ## REPORTING BUGS
-Report bugs to the GitHub issue tracker: https://github.com/yourusername/paseto_cli/issues
+Report bugs to the GitHub issue tracker: https://github.com/Govcraft/paseto_cli/issues
 
 ## COPYRIGHT
-Copyright © 2024 Roland Rodriguez. License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>.
+Copyright © 2024 Govcraft. License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>.
 This is free software: you are free to change and redistribute it. There is NO WARRANTY, to the extent permitted by law.
