@@ -34,14 +34,6 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-        target: [x86_64-unknown-linux-gnu, x86_64-apple-darwin, aarch64-apple-darwin, x86_64-pc-windows-msvc]
-        exclude:
-          - os: ubuntu-latest
-            target: [x86_64-apple-darwin, aarch64-apple-darwin, x86_64-pc-windows-msvc]
-          - os: macos-latest
-            target: [x86_64-unknown-linux-gnu, x86_64-pc-windows-msvc]
-          - os: windows-latest
-            target: [x86_64-unknown-linux-gnu, x86_64-apple-darwin, aarch64-apple-darwin]
 
     steps:
       - name: Fail if version is blank
@@ -63,29 +55,29 @@ jobs:
         shell: pwsh
         if: runner.os == 'Windows'
 
+      - name: Determine artifact name
+        id: set-artifact-name
+        run: |
+          if [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
+            echo "artifact_name=paseto_cli-linux-x64" >> $GITHUB_ENV
+          elif [[ "${{ matrix.os }}" == "macos-latest" ]]; then
+            echo "artifact_name=paseto_cli-darwin" >> $GITHUB_ENV
+          elif [[ "${{ matrix.os }}" == "windows-latest" ]]; then
+            echo "artifact_name=paseto_cli-win32-x64" >> $GITHUB_ENV
+          fi
+        shell: bash
+
       - name: Try to download existing artifact
         id: download-artifact
         uses: actions/download-artifact@v4
         with:
-          name: ${{ matrix.os == 'ubuntu-latest' && 'paseto_cli-linux-x64' || (matrix.os == 'macos-latest' && (matrix.target == 'x86_64-apple-darwin' && 'paseto_cli-darwin-x64' || 'paseto_cli-darwin-arm64')) || 'paseto_cli-win32-x64' }}
+          name: ${{ env.artifact_name }}
         continue-on-error: true
 
       - name: Check if artifact exists
         id: check-artifact
         run: |
-          if [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
-            artifact_name="paseto_cli-linux-x64"
-          elif [[ "${{ matrix.os }}" == "macos-latest" ]]; then
-            if [[ "${{ matrix.target }}" == "x86_64-apple-darwin" ]]; then
-              artifact_name="paseto_cli-darwin-x64"
-            else
-              artifact_name="paseto_cli-darwin-arm64"
-            fi
-          elif [[ "${{ matrix.os }}" == "windows-latest" ]]; then
-            artifact_name="paseto_cli-win32-x64"
-          fi
-          
-          if [ -f $artifact_name ]; then
+          if [ -f ${{ env.artifact_name }} ]; then
             echo "Artifact already exists."
             echo "artifact-exists=true" >> $GITHUB_ENV
           else
@@ -99,7 +91,7 @@ jobs:
         uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
-          target: ${{ matrix.target }}
+          target: ${{ matrix.os == 'ubuntu-latest' && 'x86_64-unknown-linux-gnu' || matrix.os == 'macos-latest' && 'x86_64-apple-darwin' || 'x86_64-pc-windows-msvc' }}
           override: true
 
       - name: Build
@@ -107,7 +99,7 @@ jobs:
         uses: actions-rs/cargo@v1
         with:
           command: build
-          args: --release --target ${{ matrix.target }}
+          args: --release --target ${{ matrix.os == 'ubuntu-latest' && 'x86_64-unknown-linux-gnu' || matrix.os == 'macos-latest' && 'x86_64-apple-darwin' || 'x86_64-pc-windows-msvc' }}
 
       - name: Package Binary
         if: env.artifact-exists == 'false'
@@ -117,9 +109,9 @@ jobs:
             tar -czf paseto_cli-linux-x64.tar.gz paseto_cli
             mv paseto_cli-linux-x64.tar.gz ../../../
           elif [[ "${{ matrix.os }}" == "macos-latest" ]]; then
-            cd target/${{ matrix.target }}/release
-            tar -czf paseto_cli-darwin-${{ matrix.target == 'x86_64-apple-darwin' && 'x64' || 'arm64' }}.tar.gz paseto_cli
-            mv paseto_cli-darwin-${{ matrix.target == 'x86_64-apple-darwin' && 'x64' || 'arm64' }}.tar.gz ../../../
+            cd target/x86_64-apple-darwin/release
+            tar -czf paseto_cli-darwin.tar.gz paseto_cli
+            mv paseto_cli-darwin.tar.gz ../../../
           elif [[ "${{ matrix.os }}" == "windows-latest" ]]; then
             cd target/x86_64-pc-windows-msvc/release
             7z a -r paseto_cli-win32-x64.zip paseto_cli.exe
@@ -131,8 +123,8 @@ jobs:
         if: env.artifact-exists == 'false'
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ matrix.os == 'ubuntu-latest' && 'paseto_cli-linux-x64' || (matrix.os == 'macos-latest' && (matrix.target == 'x86_64-apple-darwin' && 'paseto_cli-darwin-x64' || 'paseto_cli-darwin-arm64')) || 'paseto_cli-win32-x64' }}
-          path: ${{ matrix.os == 'ubuntu-latest' && 'paseto_cli-linux-x64.tar.gz' || (matrix.os == 'macos-latest' && (matrix.target == 'x86_64-apple-darwin' && 'paseto_cli-darwin-x64.tar.gz' || 'paseto_cli-darwin-arm64.tar.gz')) || 'paseto_cli-win32-x64.zip' }}
+          name: ${{ env.artifact_name }}
+          path: ${{ matrix.os == 'ubuntu-latest' && 'paseto_cli-linux-x64.tar.gz' || matrix.os == 'macos-latest' && 'paseto_cli-darwin.tar.gz' || 'paseto_cli-win32-x64.zip' }}
           compression-level: 9
   create-release:
     needs: [ build, extract-version ]
