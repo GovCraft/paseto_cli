@@ -1,0 +1,23 @@
+{
+  "name": "paseto-cli",
+  "version": "1.0.0-alpha.1",
+  "description": "A command-line tool for generating and validating PASETO v4.local tokens",
+  "main": "bin/paseto-cli.js",
+  "bin": {
+    "paseto-cli": "./bin/paseto-cli.js"
+  },
+  "scripts": {
+    "install": "node scripts/install.js"
+  },
+  "files": [
+    "bin",
+    "native",
+    "scripts"
+  ],
+  "author": "Roland Rodriguez <roland@govcraft.ai>",
+  "license": "GPL-3.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Govcraft/paseto-cli.git"
+  }
+}
