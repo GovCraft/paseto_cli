@@ -67,28 +67,31 @@ jobs:
           fi
         shell: bash
 
-      - name: Check if artifact exists
+      - name: Check if artifact exists and get download URL
         id: check-artifact
         continue-on-error: true
         run: |
           artifact_name="${{ env.artifact_name }}"
           response=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/repos/${{ github.repository }}/actions/artifacts")
-          if echo "$response" | jq -r '.artifacts[] | select(.name=="'"$artifact_name"'")' | grep -q .; then
+          artifact_info=$(echo "$response" | jq -r '.artifacts[] | select(.name=="'"$artifact_name"'")')
+          if [ -n "$artifact_info" ]; then
+            download_url=$(echo "$artifact_info" | jq -r '.archive_download_url')
             echo "Artifact already exists."
             echo "artifact-exists=true" >> $GITHUB_ENV
+            echo "artifact_download_url=$download_url" >> $GITHUB_ENV
           else
             echo "Artifact does not exist."
             echo "artifact-exists=false" >> $GITHUB_ENV
           fi
         shell: bash
 
-      - name: Try to download existing artifact
+      - name: Download existing artifact
         if: env.artifact-exists == 'true'
-        id: download-artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: ${{ env.artifact_name }}
-
+        run: |
+          curl -L -o artifact.zip "${{ env.artifact_download_url }}"
+          unzip artifact.zip -d artifact
+        shell: bash
+        
       - uses: actions/checkout@v4
       - name: Install Rust
         if: env.artifact-exists == 'false'
