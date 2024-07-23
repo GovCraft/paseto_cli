@@ -1,19 +1,30 @@
 name: Release and Publish
 
 on:
-  workflow_dispatch:
-    inputs:
-      version:
-        description: 'Version to release (e.g., 1.0.0-alpha.1)'
-        required: true
+  workflow_dispatch
 
 env:
   CARGO_TERM_COLOR: always
 
 jobs:
+  extract-version:
+    name: Extract Version
+    runs-on: ubuntu-latest
+    outputs:
+      cargo_version: ${{ steps.extract.outputs.cargo_version }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: Extract version from Cargo.toml
+        id: extract
+        run: |
+          version=$(grep '^version' Cargo.toml | sed 's/version = "//' | sed 's/"//')
+          echo "::set-output name=cargo_version::$version"
   build-linux:
     name: Build for Linux
     runs-on: ubuntu-latest
+    needs: extract-version
+    env:
+      CARGO_VERSION: ${{ needs.extract-version.outputs.cargo_version }}
     steps:
       - uses: actions/checkout@v3
       - name: Install Rust
@@ -41,6 +52,9 @@ jobs:
   build-macos:
     name: Build for macOS
     runs-on: macos-latest
+    needs: extract-version
+    env:
+      CARGO_VERSION: ${{ needs.extract-version.outputs.cargo_version }}
     strategy:
       matrix:
         target: [x86_64-apple-darwin, aarch64-apple-darwin]
@@ -71,6 +85,9 @@ jobs:
   build-windows:
     name: Build for Windows
     runs-on: windows-latest
+    needs: extract-version
+    env:
+      CARGO_VERSION: ${{ needs.extract-version.outputs.cargo_version }}
     steps:
       - uses: actions/checkout@v3
       - name: Install Rust
@@ -98,12 +115,9 @@ jobs:
   create-release:
     needs: [build-linux, build-macos, build-windows]
     runs-on: ubuntu-latest
+    env:
+      CARGO_VERSION: ${{ needs.extract-version.outputs.cargo_version }}
     steps:
-      - name: Extract version from Cargo.toml
-        id: cargo_version
-        run: |
-          version=$(grep '^version' Cargo.toml | sed 's/version = "//' | sed 's/"//')
-          echo "cargo_version=$version" >> $GITHUB_ENV
       - name: Download Artifacts
         uses: actions/download-artifact@v3
         with:
@@ -113,8 +127,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
         with:
-          tag_name: v${{ env.cargo_version }}
-          release_name: Release ${{ env.cargo_version }}
+          tag_name: v${{ env.CARGO_VERSION }}
+          release_name: Release ${{ env.CARGO_VERSION }}
           draft: false
           prerelease: false
       - name: Upload Release Assets
@@ -131,6 +145,8 @@ jobs:
   publish-npm:
     needs: create-release
     runs-on: ubuntu-latest
+    env:
+      CARGO_VERSION: ${{ needs.extract-version.outputs.cargo_version }}
     steps:
       - uses: actions/checkout@v3
       - name: Setup Node.js
@@ -141,9 +157,9 @@ jobs:
       - name: Update package.json version
         run: |
           current_version=$(node -p "require('./package.json').version")
-          if [ "$current_version" != "${{ env.cargo_version }}" ]; then
-            npm version ${{ env.cargo_version }} --no-git-tag-version
-            echo "Version updated from $current_version to ${{ env.cargo_version }}"
+          if [ "$current_version" != "${{ env.CARGO_VERSION }}" ]; then
+            npm version ${{ env.CARGO_VERSION }} --no-git-tag-version
+            echo "Version updated from $current_version to ${{ env.CARGO_VERSION }}"
           else
             echo "Version is already $current_version, no update needed"
           fi
