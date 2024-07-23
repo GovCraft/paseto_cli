@@ -124,7 +124,7 @@ jobs:
           paseto_cli-win32-x64/paseto_cli-win32-x64.zip
         tag_name: v${{ github.event.inputs.version }}
 
-publish-npm:
+  publish-npm:
     needs: create-release
     runs-on: ubuntu-latest
     steps:
