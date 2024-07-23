@@ -145,13 +145,8 @@ jobs:
         fi
     - name: Install dependencies
       run: |
-        if [ ! -f package-lock.json ]; then
-          echo "package-lock.json not found, running npm install"
-          npm install
-        else
-          echo "package-lock.json found, running npm ci"
-          npm ci
-        fi
+        npm install
+        npm ci
     - name: Publish to NPM
       run: |
         if npm view . version | grep -q "${{ github.event.inputs.version }}"; then
