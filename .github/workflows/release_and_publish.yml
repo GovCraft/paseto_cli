@@ -11,64 +11,99 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  build-and-release:
-    name: Build and Release
+  build-linux:
+    name: Build for Linux
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        include:
-          - target: x86_64-unknown-linux-gnu
-            os: linux
-            arch: x64
-          - target: x86_64-apple-darwin
-            os: darwin
-            arch: x64
-          - target: aarch64-apple-darwin
-            os: darwin
-            arch: arm64
-          - target: x86_64-pc-windows-msvc
-            os: win32
-            arch: x64
-
     steps:
     - uses: actions/checkout@v2
+    - name: Install Rust
+      uses: actions-rs/toolchain@v1
+      with:
+        toolchain: stable
+        target: x86_64-unknown-linux-gnu
+        override: true
+    - name: Build
+      uses: actions-rs/cargo@v1
+      with:
+        command: build
+        args: --release --target x86_64-unknown-linux-gnu
+    - name: Package Binary
+      run: |
+        cd target/x86_64-unknown-linux-gnu/release
+        tar -czf paseto_cli-linux-x64.tar.gz paseto_cli
+        mv paseto_cli-linux-x64.tar.gz ../../../
+    - name: Upload Binary
+      uses: actions/upload-artifact@v2
+      with:
+        name: binaries
+        path: paseto_cli-linux-x64.tar.gz
 
+  build-macos:
+    name: Build for macOS
+    runs-on: macos-latest
+    strategy:
+      matrix:
+        target: [x86_64-apple-darwin, aarch64-apple-darwin]
+    steps:
+    - uses: actions/checkout@v2
     - name: Install Rust
       uses: actions-rs/toolchain@v1
       with:
         toolchain: stable
         target: ${{ matrix.target }}
         override: true
-
     - name: Build
       uses: actions-rs/cargo@v1
       with:
         command: build
         args: --release --target ${{ matrix.target }}
-
     - name: Package Binary
       run: |
         cd target/${{ matrix.target }}/release
-        tar -czf paseto_cli-${{ matrix.os }}-${{ matrix.arch }}.tar.gz paseto_cli*
-        mv paseto_cli-${{ matrix.os }}-${{ matrix.arch }}.tar.gz ../../../
-
+        tar -czf paseto_cli-darwin-${{ matrix.target == 'x86_64-apple-darwin' && 'x64' || 'arm64' }}.tar.gz paseto_cli
+        mv paseto_cli-darwin-${{ matrix.target == 'x86_64-apple-darwin' && 'x64' || 'arm64' }}.tar.gz ../../../
     - name: Upload Binary
       uses: actions/upload-artifact@v2
       with:
         name: binaries
-        path: paseto_cli-${{ matrix.os }}-${{ matrix.arch }}.tar.gz
+        path: paseto_cli-darwin-${{ matrix.target == 'x86_64-apple-darwin' && 'x64' || 'arm64' }}.tar.gz
+
+  build-windows:
+    name: Build for Windows
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install Rust
+      uses: actions-rs/toolchain@v1
+      with:
+        toolchain: stable
+        target: x86_64-pc-windows-msvc
+        override: true
+    - name: Build
+      uses: actions-rs/cargo@v1
+      with:
+        command: build
+        args: --release --target x86_64-pc-windows-msvc
+    - name: Package Binary
+      run: |
+        cd target/x86_64-pc-windows-msvc/release
+        7z a paseto_cli-win32-x64.zip paseto_cli.exe
+        move paseto_cli-win32-x64.zip ../../../
+    - name: Upload Binary
+      uses: actions/upload-artifact@v2
+      with:
+        name: binaries
+        path: paseto_cli-win32-x64.zip
 
   create-release:
-    needs: build-and-release
+    needs: [build-linux, build-macos, build-windows]
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-
     - name: Download Binaries
       uses: actions/download-artifact@v2
       with:
         name: binaries
-
     - name: Create Release
       id: create_release
       uses: actions/create-release@v1
@@ -79,36 +114,31 @@ jobs:
         release_name: Release ${{ github.event.inputs.version }}
         draft: false
         prerelease: false
-
     - name: Upload Release Assets
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./paseto_cli-${{ matrix.os }}-${{ matrix.arch }}.tar.gz
-        asset_name: paseto_cli-${{ matrix.os }}-${{ matrix.arch }}.tar.gz
-        asset_content_type: application/gzip
+        asset_path: ./paseto_cli-${{ matrix.os }}-${{ matrix.arch }}.${{ matrix.os == 'win32' && 'zip' || 'tar.gz' }}
+        asset_name: paseto_cli-${{ matrix.os }}-${{ matrix.arch }}.${{ matrix.os == 'win32' && 'zip' || 'tar.gz' }}
+        asset_content_type: ${{ matrix.os == 'win32' && 'application/zip' || 'application/gzip' }}
 
   publish-npm:
     needs: create-release
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-
     - name: Setup Node.js
       uses: actions/setup-node@v2
       with:
         node-version: '14'
         registry-url: 'https://registry.npmjs.org'
-
     - name: Update package.json version
       run: |
         npm version ${{ github.event.inputs.version }} --no-git-tag-version
-
     - name: Install dependencies
       run: npm ci
-
     - name: Publish to NPM
       run: npm publish
       env:
