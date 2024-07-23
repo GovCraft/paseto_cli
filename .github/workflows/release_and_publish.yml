@@ -141,7 +141,7 @@ jobs:
           path: paseto_cli-win32-x64.zip
 
   create-release:
-    needs: [build-linux, build-macos, build-windows]
+    needs: [build-linux, build-macos, build-windows, extract-version]
     runs-on: ubuntu-latest
     env:
       CARGO_VERSION: ${{ needs.extract-version.outputs.cargo_version }}
@@ -178,7 +178,7 @@ jobs:
             paseto_cli-win32-x64.zip
 
   publish-npm:
-    needs: create-release
+    needs: [create-release, extract-version]
     runs-on: ubuntu-latest
     env:
       CARGO_VERSION: ${{ needs.extract-version.outputs.cargo_version }}
