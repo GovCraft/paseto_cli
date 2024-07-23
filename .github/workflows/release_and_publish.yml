@@ -195,7 +195,7 @@ jobs:
         with:
           run-id: ${{ needs.build.outputs.workflow_run_id }}
           path: .
-        run:
+        run: |
           echo "Downloading artifacts from workflow id: ${{ needs.build.outputs.workflow_run_id }}"
       - name: Install dependencies
         env:
