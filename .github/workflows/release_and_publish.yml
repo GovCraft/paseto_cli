@@ -13,7 +13,7 @@ jobs:
     outputs:
       cargo_version: ${{ steps.extract.outputs.cargo_version }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Extract version from Cargo.toml
         id: extract
         run: |
@@ -26,7 +26,7 @@ jobs:
     env:
       CARGO_VERSION: ${{ needs.extract-version.outputs.cargo_version }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Install Rust
         uses: actions-rs/toolchain@v1
         with:
@@ -59,7 +59,7 @@ jobs:
       matrix:
         target: [x86_64-apple-darwin, aarch64-apple-darwin]
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Install Rust
         uses: actions-rs/toolchain@v1
         with:
@@ -89,7 +89,7 @@ jobs:
     env:
       CARGO_VERSION: ${{ needs.extract-version.outputs.cargo_version }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Install Rust
         uses: actions-rs/toolchain@v1
         with:
@@ -148,7 +148,7 @@ jobs:
     env:
       CARGO_VERSION: ${{ needs.extract-version.outputs.cargo_version }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
