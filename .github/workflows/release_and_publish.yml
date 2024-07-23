@@ -155,8 +155,8 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           path: .
-      - name: Create Release
-        uses: actions/create-release@v1
+      - name: Create Release and Upload Release Assets
+        uses: softprops/action-gh-release@v2
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
         with:
@@ -164,11 +164,7 @@ jobs:
           release_name: Release ${{ needs.extract-version.outputs.cargo_version }}
           draft: false
           prerelease: false
-      - name: Upload Release Assets
-        uses: softprops/action-gh-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
-        with:
+          token: ${{ secrets.RELEASE_TOKEN }}
           files: |
             paseto_cli-linux-x64.tar.gz
             paseto_cli-darwin-x64.tar.gz
@@ -237,4 +233,3 @@ jobs:
           npm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-  
