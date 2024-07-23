@@ -11,6 +11,7 @@ jobs:
     name: Extract Version
     runs-on: ubuntu-latest
     outputs:
+      cargo_version: ${{ steps.extract.outputs.cargo_version }}
       workflow_run_id: ${{ steps.set-workflow-run-id.outputs.workflow_run_id }}
     steps:
       - uses: actions/checkout@v4
