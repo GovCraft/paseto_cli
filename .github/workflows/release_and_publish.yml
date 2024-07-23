@@ -111,11 +111,11 @@ jobs:
     steps:
       - name: Fail if version is blank
         run: |
-          if [ -z "$CARGO_VERSION" ]; then
-            echo "Error: CARGO_VERSION is blank."
-            exit 1
-          fi
-          echo "Cargo version is $CARGO_VERSION"
+          if "%CARGO_VERSION%"=="" (
+          echo Error: CARGO_VERSION is blank.
+          exit /b 1
+          )
+          echo Cargo version is %CARGO_VERSION%
       - uses: actions/checkout@v3
       - name: Install Rust
         uses: actions-rs/toolchain@v1
