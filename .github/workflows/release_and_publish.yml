@@ -87,8 +87,8 @@ jobs:
       - name: Package Binary
         run: |
           cd target/x86_64-pc-windows-msvc/release
-          zip -r paseto_cli-win32-x64.zip paseto_cli.exe
-          mv paseto_cli-win32-x64.zip ../../../
+          7z a -r paseto_cli-win32-x64.zip paseto_cli.exe
+          move paseto_cli-win32-x64.zip ../../../
       - name: Upload Binary
         uses: actions/upload-artifact@v3
         with:
