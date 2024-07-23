@@ -11,7 +11,6 @@ jobs:
     name: Extract Version
     runs-on: ubuntu-latest
     outputs:
-      cargo_version: ${{ steps.extract.outputs.cargo_version }}
       workflow_run_id: ${{ steps.set-workflow-run-id.outputs.workflow_run_id }}
     steps:
       - uses: actions/checkout@v4
@@ -29,6 +28,8 @@ jobs:
   build:
     name: Build and Package
     runs-on: ${{ matrix.os }}
+    outputs:
+      workflow_run_id: ${{ steps.set-workflow-run-id.outputs.workflow_run_id }}
     needs: extract-version
     env:
       CARGO_VERSION: ${{ needs.extract-version.outputs.cargo_version }}
@@ -80,9 +81,6 @@ jobs:
             workflow_run_id=$(echo "$artifact_info" | jq -r '.workflow_run.id')
             echo "Artifact $artifact_name already exists from workflow id: $workflow_run_id."
             echo "artifact-exists=true" >> $GITHUB_ENV
-            echo "artifact_download_url=$download_url" >> $GITHUB_ENV
-            echo "workflow_run_id=$workflow_run_id" >> $GITHUB_ENV
-            echo "workflow_run_id=$workflow_run_id" >> $GITHUB_ENV
           else
             echo "Artifact does not exist."
             echo "artifact-exists=false" >> $GITHUB_ENV
