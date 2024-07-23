@@ -87,6 +87,7 @@ jobs:
             echo "artifact-exists=false" >> $GITHUB_ENV
             echo "workflow_run_id=${{ github.run_id }}" >> $GITHUB_ENV
           fi
+          echo "::set-output name=workflow_run_id::$workflow_run_id"
         shell: bash
 
 
