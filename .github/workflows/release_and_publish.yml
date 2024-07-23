@@ -55,13 +55,26 @@ jobs:
       - name: Check if artifact exists
         id: check-artifact
         run: |
-          if [ -d ${{ matrix.os == 'ubuntu-latest' && 'paseto_cli-linux-x64' || matrix.os == 'macos-latest' && 'paseto_cli-darwin-'${{ matrix.target == 'x86_64-apple-darwin' && 'x64' || 'arm64' }} || 'paseto_cli-win32-x64' }} ]; then
+          if [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
+            artifact_name="paseto_cli-linux-x64"
+          elif [[ "${{ matrix.os }}" == "macos-latest" ]]; then
+            if [[ "${{ matrix.target }}" == "x86_64-apple-darwin" ]]; then
+              artifact_name="paseto_cli-darwin-x64"
+            else
+              artifact_name="paseto_cli-darwin-arm64"
+            fi
+          elif [[ "${{ matrix.os }}" == "windows-latest" ]]; then
+            artifact_name="paseto_cli-win32-x64"
+          fi
+          
+          if [ -f $artifact_name ]; then
             echo "Artifact already exists."
             echo "artifact-exists=true" >> $GITHUB_ENV
           else
             echo "Artifact does not exist."
             echo "artifact-exists=false" >> $GITHUB_ENV
           fi
+        shell: bash
       - name: Install Rust
         uses: actions-rs/toolchain@v1
         with:
@@ -90,12 +103,12 @@ jobs:
           fi
         shell: bash
       - name: Upload Binary
+        if: env.artifact-exists == 'false'
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ matrix.os == 'ubuntu-latest' && 'paseto_cli-linux-x64' || matrix.os == 'macos-latest' && 'paseto_cli-darwin-'}}${{ matrix.target == 'x86_64-apple-darwin' && 'x64' || 'arm64' }} || 'paseto_cli-win32-x64' }}
-          path: ${{ matrix.os == 'ubuntu-latest' && 'paseto_cli-linux-x64.tar.gz' || matrix.os == 'macos-latest' && 'paseto_cli-darwin-'}}${{ matrix.target == 'x86_64-apple-darwin' && 'x64' || 'arm64' }}.tar.gz || 'paseto_cli-win32-x64.zip' }}
+          name: ${{ matrix.os == 'ubuntu-latest' && 'paseto_cli-linux-x64' || (matrix.os == 'macos-latest' && (matrix.target == 'x86_64-apple-darwin' && 'paseto_cli-darwin-x64' || 'paseto_cli-darwin-arm64')) || 'paseto_cli-win32-x64' }}
+          path: ${{ matrix.os == 'ubuntu-latest' && 'paseto_cli-linux-x64.tar.gz' || (matrix.os == 'macos-latest' && (matrix.target == 'x86_64-apple-darwin' && 'paseto_cli-darwin-x64.tar.gz' || 'paseto_cli-darwin-arm64.tar.gz')) || 'paseto_cli-win32-x64.zip' }}
           compression-level: 9
-
   create-release:
     needs: [ build-linux, build-windows, extract-version ]
     runs-on: ubuntu-latest
