@@ -9,7 +9,7 @@ const BINARY_DISTRIBUTION_PACKAGES = {
     'win32-x64': 'paseto_cli-windows-x64'
 };
 
-const BINARY_DISTRIBUTION_VERSION = '1.0.0-alpha.2';
+const BINARY_DISTRIBUTION_VERSION = process.env.BINARY_DISTRIBUTION_VERSION || '1.0.0-alpha.2'; // Default to a version if not set
 const binaryName = process.platform === 'win32' ? 'paseto_cli.exe' : 'paseto_cli';
 const platformSpecificPackageName = BINARY_DISTRIBUTION_PACKAGES[`${process.platform}-${process.arch}`];
 const fallbackBinaryPath = path.join(__dirname, binaryName);

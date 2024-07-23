@@ -166,10 +166,8 @@ jobs:
           prerelease: false
           token: ${{ secrets.RELEASE_TOKEN }}
           files: |
-            paseto_cli-linux-x64.tar.gz
-            paseto_cli-darwin-x64.tar.gz
-            paseto_cli-darwin-arm64.tar.gz
-            paseto_cli-win32-x64.zip
+            *.tar.gz
+            *.zip
 
   publish-npm:
     needs: [ create-release, extract-version ]
@@ -198,6 +196,8 @@ jobs:
             echo "Version is already $current_version, no update needed"
           fi
       - name: Install dependencies
+        env:
+          BINARY_DISTRIBUTION_VERSION: ${{ needs.extract-version.outputs.cargo_version }}
         run: |
           npm install
           npm ci
