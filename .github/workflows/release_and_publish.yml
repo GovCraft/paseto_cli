@@ -12,6 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       cargo_version: ${{ steps.extract.outputs.cargo_version }}
+      workflow_run_id: ${{ steps.set-workflow-run-id.outputs.workflow_run_id }}
     steps:
       - uses: actions/checkout@v4
       - name: Extract version from Cargo.toml
@@ -73,16 +74,18 @@ jobs:
         run: |
           artifact_name="${{ env.artifact_name }}"
           response=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/repos/${{ github.repository }}/actions/artifacts")
-          echo "$response"
           artifact_info=$(echo "$response" | jq -r '.artifacts[] | select(.name=="'"$artifact_name"'")')
           if [ -n "$artifact_info" ]; then
             download_url=$(echo "$artifact_info" | jq -r '.archive_download_url')
+            workflow_run_id=$(echo "$artifact_info" | jq -r '.workflow_run.id')
             echo "Artifact already exists."
             echo "artifact-exists=true" >> $GITHUB_ENV
             echo "artifact_download_url=$download_url" >> $GITHUB_ENV
+            echo "::set-output name=workflow_run_id::$workflow_run_id"
           else
             echo "Artifact does not exist."
             echo "artifact-exists=false" >> $GITHUB_ENV
+            echo "::set-output name=workflow_run_id::${{ github.run_id }}"
           fi
         shell: bash
 
@@ -139,8 +142,9 @@ jobs:
           fi
           echo "Cargo version is ${{ needs.extract-version.outputs.cargo_version }}"
       - name: Download Artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
+          run-id: ${{ needs.build.outputs.workflow_run_id }}
           path: .
       - name: Create Release and Upload Release Assets
         uses: softprops/action-gh-release@v2
@@ -157,7 +161,7 @@ jobs:
             *.zip
 
   publish-npm:
-    needs: [ create-release, extract-version ]
+    needs: [ create-release, extract-version, build ]
     runs-on: ubuntu-latest
     steps:
       - name: Fail if version is blank
@@ -182,6 +186,11 @@ jobs:
           else
             echo "Version is already $current_version, no update needed"
           fi
+      - name: Download Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          run-id: ${{ needs.build.outputs.workflow_run_id }}
+          path: .
       - name: Install dependencies
         env:
           BINARY_DISTRIBUTION_VERSION: ${{ needs.extract-version.outputs.cargo_version }}
