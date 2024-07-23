@@ -124,7 +124,7 @@ jobs:
           paseto_cli-win32-x64/paseto_cli-win32-x64.zip
         tag_name: v${{ github.event.inputs.version }}
 
-  publish-npm:
+publish-npm:
     needs: create-release
     runs-on: ubuntu-latest
     steps:
@@ -132,7 +132,7 @@ jobs:
     - name: Setup Node.js
       uses: actions/setup-node@v3
       with:
-        node-version: '14'
+        node-version: '20'  # Use the latest LTS version
         registry-url: 'https://registry.npmjs.org'
     - name: Update package.json version
       run: |
@@ -144,7 +144,14 @@ jobs:
           echo "Version is already $current_version, no update needed"
         fi
     - name: Install dependencies
-      run: npm ci
+      run: |
+        if [ ! -f package-lock.json ]; then
+          echo "package-lock.json not found, running npm install"
+          npm install
+        else
+          echo "package-lock.json found, running npm ci"
+          npm ci
+        fi
     - name: Publish to NPM
       run: |
         if npm view . version | grep -q "${{ github.event.inputs.version }}"; then
