@@ -86,6 +86,7 @@ jobs:
           fi
         shell: bash
 
+      - uses: actions/checkout@v4
       - name: Install Rust
         if: env.artifact-exists == 'false'
         uses: actions-rs/toolchain@v1
