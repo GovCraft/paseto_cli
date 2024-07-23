@@ -78,7 +78,7 @@ jobs:
           if [ -n "$artifact_info" ]; then
             download_url=$(echo "$artifact_info" | jq -r '.archive_download_url')
             workflow_run_id=$(echo "$artifact_info" | jq -r '.workflow_run.id')
-            echo "Artifact already exists."
+            echo "Artifact $artifact_name already exists from workflow id: $workflow_run_id."
             echo "artifact-exists=true" >> $GITHUB_ENV
             echo "artifact_download_url=$download_url" >> $GITHUB_ENV
             echo "workflow_run_id=$workflow_run_id" >> $GITHUB_ENV
@@ -89,9 +89,11 @@ jobs:
             echo "workflow_run_id=${{ github.run_id }}" >> $GITHUB_ENV
           fi
         shell: bash
-      
 
-      - uses: actions/checkout@v4
+
+      - name: Checkout code
+        if: env.artifact-exists == 'false'
+        uses: actions/checkout@v4
       - name: Install Rust
         if: env.artifact-exists == 'false'
         uses: actions-rs/toolchain@v1
@@ -193,6 +195,8 @@ jobs:
         with:
           run-id: ${{ needs.build.outputs.workflow_run_id }}
           path: .
+        run:
+          echo "Downloading artifacts from workflow id: ${{ needs.build.outputs.workflow_run_id }}"
       - name: Install dependencies
         env:
           BINARY_DISTRIBUTION_VERSION: ${{ needs.extract-version.outputs.cargo_version }}
