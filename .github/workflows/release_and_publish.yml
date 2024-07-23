@@ -25,7 +25,6 @@ jobs:
             exit 1
           fi
           echo "cargo_version=$version" >> $GITHUB_ENV
-          echo "::set-output name=cargo_version::$version"
   build:
     name: Build and Package
     runs-on: ${{ matrix.os }}
@@ -82,12 +81,12 @@ jobs:
             workflow_run_id=$(echo "$artifact_info" | jq -r '.workflow_run.id')
             echo "Artifact $artifact_name already exists from workflow id: $workflow_run_id."
             echo "artifact-exists=true" >> $GITHUB_ENV
+            echo "workflow_run_id=${{ workflow_run_id }}" >> $GITHUB_ENV
           else
             echo "Artifact does not exist."
             echo "artifact-exists=false" >> $GITHUB_ENV
             echo "workflow_run_id=${{ github.run_id }}" >> $GITHUB_ENV
           fi
-          echo "::set-output name=workflow_run_id::$workflow_run_id"
         shell: bash
 
 
