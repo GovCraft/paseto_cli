@@ -141,18 +141,16 @@ jobs:
           path: paseto_cli-win32-x64.zip
 
   create-release:
-    needs: [build-linux, build-macos, build-windows, extract-version]
+    needs: [ build-linux, build-windows, extract-version ]
     runs-on: ubuntu-latest
-    env:
-      CARGO_VERSION: ${{ needs.extract-version.outputs.cargo_version }}
     steps:
       - name: Fail if version is blank
         run: |
-          if [ -z "$CARGO_VERSION" ]; then
-            echo "Error: CARGO_VERSION is blank."
+          if [ -z "${{ needs.extract-version.outputs.cargo_version }}" ]; then
+            echo "Error: Version is blank."
             exit 1
           fi
-          echo "Cargo version is $CARGO_VERSION"
+          echo "Cargo version is ${{ needs.extract-version.outputs.cargo_version }}"
       - name: Download Artifacts
         uses: actions/download-artifact@v3
         with:
@@ -162,8 +160,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
         with:
-          tag_name: v${{ env.CARGO_VERSION }}
-          release_name: Release ${{ env.CARGO_VERSION }}
+          tag_name: v${{ needs.extract-version.outputs.cargo_version }}
+          release_name: Release ${{ needs.extract-version.outputs.cargo_version }}
           draft: false
           prerelease: false
       - name: Upload Release Assets
@@ -178,18 +176,16 @@ jobs:
             paseto_cli-win32-x64.zip
 
   publish-npm:
-    needs: [create-release, extract-version]
+    needs: [ create-release, extract-version ]
     runs-on: ubuntu-latest
-    env:
-      CARGO_VERSION: ${{ needs.extract-version.outputs.cargo_version }}
     steps:
       - name: Fail if version is blank
         run: |
-          if [ -z "$CARGO_VERSION" ]; then
+          if [ -z "${{ needs.extract-version.outputs.cargo_version }}" ]; then
             echo "Error: CARGO_VERSION is blank."
             exit 1
           fi
-          echo "Cargo version is $CARGO_VERSION"
+          echo "Cargo version is ${{ needs.extract-version.outputs.cargo_version }}"
       - uses: actions/checkout@v3
       - name: Setup Node.js
         uses: actions/setup-node@v3
@@ -199,9 +195,9 @@ jobs:
       - name: Update package.json version
         run: |
           current_version=$(node -p "require('./package.json').version")
-          if [ "$current_version" != "${{ env.CARGO_VERSION }}" ]; then
-            npm version ${{ env.CARGO_VERSION }} --no-git-tag-version
-            echo "Version updated from $current_version to ${{ env.CARGO_VERSION }}"
+          if [ "$current_version" != "${{ needs.extract-version.outputs.cargo_version }}" ]; then
+            npm version ${{ needs.extract-version.outputs.cargo_version }} --no-git-tag-version
+            echo "Version updated from $current_version to ${{ needs.extract-version.outputs.cargo_version }}"
           else
             echo "Version is already $current_version, no update needed"
           fi
@@ -241,3 +237,4 @@ jobs:
           npm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+  
