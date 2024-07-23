@@ -110,12 +110,13 @@ jobs:
       CARGO_VERSION: ${{ needs.extract-version.outputs.cargo_version }}
     steps:
       - name: Fail if version is blank
+        shell: powershell
         run: |
-          if "%CARGO_VERSION%"=="" (
-          echo Error: CARGO_VERSION is blank.
-          exit /b 1
-          )
-          echo Cargo version is %CARGO_VERSION%
+          if (-not $env:CARGO_VERSION) {
+          Write-Error "Error: CARGO_VERSION is blank."
+          exit 1
+          }
+          Write-Host "Cargo version is $env:CARGO_VERSION"
       - uses: actions/checkout@v3
       - name: Install Rust
         uses: actions-rs/toolchain@v1
