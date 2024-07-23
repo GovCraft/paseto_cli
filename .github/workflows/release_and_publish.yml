@@ -136,10 +136,22 @@ jobs:
         registry-url: 'https://registry.npmjs.org'
     - name: Update package.json version
       run: |
-        npm version ${{ github.event.inputs.version }} --no-git-tag-version
+        current_version=$(node -p "require('./package.json').version")
+        if [ "$current_version" != "${{ github.event.inputs.version }}" ]; then
+          npm version ${{ github.event.inputs.version }} --no-git-tag-version
+          echo "Version updated from $current_version to ${{ github.event.inputs.version }}"
+        else
+          echo "Version is already $current_version, no update needed"
+        fi
     - name: Install dependencies
       run: npm ci
     - name: Publish to NPM
-      run: npm publish
+      run: |
+        if npm view . version | grep -q "${{ github.event.inputs.version }}"; then
+          echo "Version ${{ github.event.inputs.version }} is already published on npm"
+        else
+          npm publish
+          echo "Published version ${{ github.event.inputs.version }} to npm"
+        fi
       env:
         NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
