@@ -4,8 +4,9 @@ version = "1.0.0-alpha.1"
 edition = "2021"
 description = "A command-line tool for generating and validating PASETO v4.local tokens"
 authors = ["Roland Rodriguez <roland@govcraft.ai>"]
+
 [dependencies]
-rusty_paseto = "0.7.1"
+rusty_paseto = { version = "0.7.1", features = ["v4_local"] }
 anyhow = "1.0.86"
 clap = { version = "4.5.9", features = ["cargo", "derive", "wrap_help"] }
 serde_json = "1.0.120"
