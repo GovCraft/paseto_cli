@@ -1,14 +1,12 @@
-# 🔐 PASETO CLI
+# PASETO CLI
 
-Welcome to PASETO CLI - Your Swiss Army Knife for PASETO v4.local Tokens!
-
-![PASETO CLI Logo](https://via.placeholder.com/150x150.png?text=PASETO+CLI)
+PASETO CLI generates and validates PASETO v4.local tokens.
 
 [![Build Status](https://img.shields.io/travis/Govcraft/paseto-cli/master.svg?style=flat-square)](https://travis-ci.org/Govcraft/paseto-cli)
 [![License](https://img.shields.io/badge/license-GPL--3.0-blue.svg?style=flat-square)](https://github.com/GovCraft/paseto_cli/blob/main/LICENSE)
 [![Crates.io](https://img.shields.io/crates/v/paseto_cli.svg?style=flat-square)](https://crates.io/crates/paseto_cli)
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Installation
 
@@ -28,29 +26,26 @@ echo "your-32-byte-key-in-base64" | paseto_cli generate --subject "user123" --ex
 echo "your-32-byte-key-in-base64" | paseto_cli validate --token "v4.local.your-token-here" --subject "user123"
 ```
 
-## 🎭 What is PASETO CLI?
+## Features
 
-PASETO CLI is a powerful command-line tool that simplifies working with PASETO (Platform-Agnostic SEcurity TOkens) v4.local tokens. Whether you're a developer, system administrator, or security enthusiast, PASETO CLI has got you covered!
+- Generates PASETO v4.local tokens with custom claims
+- Validates existing tokens and verifies their claims
+- Supports multiple output formats: plain, pretty, and JSON
+- Handles relative time expressions (e.g., "2h", "1d")
+- Adheres to PASETO best practices
 
-### ✨ Key Features
+## Table of Contents
 
-- 🛠 Generate PASETO v4.local tokens with custom claims
-- ✅ Validate existing tokens and verify their claims
-- 🎨 Multiple output formats: plain, pretty, and JSON
-- ⏱ Support for relative time expressions (e.g., "2h", "1d")
-- 🔒 Secure by default, adhering to PASETO best practices
+- [Installation](#installation)
+- [Usage](#usage)
+- [Examples](#examples)
+- [Use Cases](#use-cases)
+- [Security Considerations](#security-considerations)
+- [Contributing](#contributing)
+- [License](#license)
+- [About the Author](#about-the-author)
 
-## 📚 Table of Contents
-
-- [Installation](#-installation)
-- [Usage](#-usage)
-- [Examples](#-examples)
-- [Use Cases](#-use-cases)
-- [Security Considerations](#-security-considerations)
-- [Contributing](#-contributing)
-- [License](#-license)
-
-## 📥 Installation
+## Installation
 
 ### Using Cargo
 
@@ -66,9 +61,9 @@ cd paseto-cli
 cargo build --release
 ```
 
-The binary will be available at `target/release/paseto_cli`.
+The binary is located at `target/release/paseto_cli`.
 
-## 🛠 Usage
+## Usage
 
 PASETO CLI provides two main commands: `generate` and `validate`.
 
@@ -79,14 +74,14 @@ echo "your-32-byte-key-in-base64" | paseto_cli generate [OPTIONS]
 ```
 
 Options:
-- `-s, --subject <SUBJECT>`: Set the subject claim
-- `-i, --issuer <ISSUER>`: Set the issuer claim
-- `-a, --audience <AUDIENCE>`: Set the audience claim
-- `--jti <JTI>`: Set the token identifier claim
-- `--expiration <EXPIRATION>`: Set the expiration time
-- `--not-before <NOT_BEFORE>`: Set the not-before time
-- `--issued-at <ISSUED_AT>`: Set the issued-at time
-- `-c, --custom <KEY=VALUE>`: Add custom claims
+- `-s, --subject <SUBJECT>`: Sets the subject claim
+- `-i, --issuer <ISSUER>`: Sets the issuer claim
+- `-a, --audience <AUDIENCE>`: Sets the audience claim
+- `--jti <JTI>`: Sets the token identifier claim
+- `--expiration <EXPIRATION>`: Sets the expiration time
+- `--not-before <NOT_BEFORE>`: Sets the not-before time
+- `--issued-at <ISSUED_AT>`: Sets the issued-at time
+- `-c, --custom <KEY=VALUE>`: Adds custom claims
 
 ### Validate a Token
 
@@ -95,23 +90,23 @@ echo "your-32-byte-key-in-base64" | paseto_cli validate --token <TOKEN> [OPTIONS
 ```
 
 Options:
-- `-t, --token <TOKEN>`: The PASETO token to validate (required)
-- `-s, --subject <SUBJECT>`: Expected subject claim
-- `-i, --issuer <ISSUER>`: Expected issuer claim
-- `-a, --audience <AUDIENCE>`: Expected audience claim
-- `--jti <JTI>`: Expected token identifier claim
-- `--expiration <EXPIRATION>`: Expected expiration time
-- `--not-before <NOT_BEFORE>`: Expected not-before time
-- `--issued-at <ISSUED_AT>`: Expected issued-at time
-- `-c, --custom <KEY=VALUE>`: Expected custom claims
+- `-t, --token <TOKEN>`: Specifies the PASETO token to validate (required)
+- `-s, --subject <SUBJECT>`: Specifies the expected subject claim
+- `-i, --issuer <ISSUER>`: Specifies the expected issuer claim
+- `-a, --audience <AUDIENCE>`: Specifies the expected audience claim
+- `--jti <JTI>`: Specifies the expected token identifier claim
+- `--expiration <EXPIRATION>`: Specifies the expected expiration time
+- `--not-before <NOT_BEFORE>`: Specifies the expected not-before time
+- `--issued-at <ISSUED_AT>`: Specifies the expected issued-at time
+- `-c, --custom <KEY=VALUE>`: Specifies expected custom claims
 
 ### Global Options
 
-- `-f, --format <FORMAT>`: Set the output format (plain, pretty, json)
-- `-h, --help`: Print help information
-- `-V, --version`: Print version information
+- `-f, --format <FORMAT>`: Sets the output format (plain, pretty, json)
+- `-h, --help`: Prints help information
+- `-V, --version`: Prints version information
 
-## 🌟 Examples
+## Examples
 
 ### Generate a Token with Custom Claims
 
@@ -131,37 +126,41 @@ echo "your-32-byte-key-in-base64" | paseto_cli --format pretty validate --token 
 echo "your-32-byte-key-in-base64" | paseto_cli --format json generate --subject "user123" --expiration "2h"
 ```
 
-## 🎯 Use Cases
+## Use Cases
 
-1. 🔐 **User Authentication**: Generate tokens for secure user login systems.
-2. 🚦 **API Authorization**: Include role-based access control in tokens.
-3. 🔀 **Single Sign-On (SSO)**: Create tokens for seamless multi-service authentication.
-4. 🔑 **API Key Management**: Generate and validate long-lived API keys.
-5. 💻 **Session Management**: Create short-lived tokens for web application sessions.
-6. 🌐 **Microservices Communication**: Secure inter-service data exchange.
-7. 🏠 **IoT Device Authentication**: Authenticate IoT devices with central servers.
-8. 📝 **Audit Logging**: Track user actions with custom claims for comprehensive logs.
-9. 🧪 **Testing and Development**: Generate specific tokens for auth flow testing.
-10. 🔄 **Token Rotation**: Implement secure token rotation strategies.
+1. User Authentication: Generates tokens for user login systems.
+2. API Authorization: Includes role-based access control in tokens.
+3. Single Sign-On (SSO): Creates tokens for multi-service authentication.
+4. API Key Management: Generates and validates long-lived API keys.
+5. Session Management: Creates short-lived tokens for web application sessions.
+6. Microservices Communication: Secures inter-service data exchange.
+7. IoT Device Authentication: Authenticates IoT devices with central servers.
+8. Audit Logging: Tracks user actions with custom claims for logs.
+9. Testing and Development: Generates specific tokens for auth flow testing.
+10. Token Rotation: Implements token rotation strategies.
 
-## 🛡 Security Considerations
+## Security Considerations
 
-1. 🔐 **Key Management**: Keep your PASETO v4 key secure and confidential.
-2. ⏳ **Token Lifetime**: Use appropriate expiration times based on security needs.
-3. ✅ **Claim Validation**: Always validate all relevant claims when verifying tokens.
-4. 🔒 Encrypted Payload: Remember that while v4.local tokens encrypt their payload, protecting the confidentiality of claims, the encryption key must still be kept secure.
-5. 🔄 **Key Rotation**: Implement a strategy to periodically update your PASETO v4 key.
+1. Key Management: Store the PASETO v4 key securely.
+2. Token Lifetime: Set appropriate expiration times based on security requirements.
+3. Claim Validation: Validate all relevant claims when verifying tokens.
+4. Encrypted Payload: v4.local tokens encrypt their payload, protecting the confidentiality of claims. The encryption key must be kept secure.
+5. Key Rotation: Implement a strategy to periodically update the PASETO v4 key.
 
-## 🤝 Contributing
+## Contributing
 
-We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.md) for more details.
+Contributions are welcome. See [Contributing Guidelines](CONTRIBUTING.md) for more details.
 
-## 📄 License
+## License
 
 PASETO CLI is licensed under the GNU General Public License v3.0. See the [LICENSE](LICENSE) file for details.
 
+## About the Author
+
+I'm @rrrodzilla, a technologist with 30 years of industry experience. I'm a former SOA and cloud architect, and former Principal Technical Product Manager at AWS for the Rust Programming Language. Currently, I'm the owner and operator of Govcraft, building and consulting on Rust and AI solutions.
+
+For more information, visit https://www.govcraft.ai
+
 ---
 
-Built with ❤️ by [Govcraft](https://www.github.com/Govcraft). For issues, feature requests, or questions, please [open an issue](https://github.com/Govcraft/paseto-cli/issues).
-
-Happy token generating and validating! 🎉
+For issues, feature requests, or questions, open an issue at https://github.com/Govcraft/paseto-cli/issues.
