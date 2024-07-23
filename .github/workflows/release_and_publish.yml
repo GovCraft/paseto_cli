@@ -77,7 +77,9 @@ jobs:
       - name: Check if artifact exists
         id: check-artifact
         run: |
-          if [ -f ${{ env.artifact_name }} ]; then
+          artifact_name="${{ env.artifact_name }}"
+          response=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/repos/${{ github.repository }}/actions/artifacts")
+          if echo "$response" | jq -r '.artifacts[] | select(.name=="'"$artifact_name"'")' | grep -q .; then
             echo "Artifact already exists."
             echo "artifact-exists=true" >> $GITHUB_ENV
           else
@@ -167,7 +169,7 @@ jobs:
             exit 1
           fi
           echo "Cargo version is ${{ needs.extract-version.outputs.cargo_version }}"
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
