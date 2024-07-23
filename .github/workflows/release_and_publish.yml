@@ -17,7 +17,12 @@ jobs:
       - name: Extract version from Cargo.toml
         id: extract
         run: |
-          version=$(grep '^version' Cargo.toml | sed 's/version = "//' | sed 's/"//')
+          version=$(grep '^version =' Cargo.toml | sed 's/version = "//' | sed 's/"//')
+          echo "Extracted version: $version"
+          if [ -z "$version" ]; then
+            echo "Error: Version is blank."
+            exit 1
+          fi
           echo "::set-output name=cargo_version::$version"
   build-linux:
     name: Build for Linux
@@ -26,7 +31,7 @@ jobs:
     env:
       CARGO_VERSION: ${{ needs.extract-version.outputs.cargo_version }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v3
       - name: Install Rust
         uses: actions-rs/toolchain@v1
         with:
@@ -59,7 +64,7 @@ jobs:
       matrix:
         target: [x86_64-apple-darwin, aarch64-apple-darwin]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v3
       - name: Install Rust
         uses: actions-rs/toolchain@v1
         with:
@@ -89,7 +94,7 @@ jobs:
     env:
       CARGO_VERSION: ${{ needs.extract-version.outputs.cargo_version }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v3
       - name: Install Rust
         uses: actions-rs/toolchain@v1
         with:
@@ -148,7 +153,7 @@ jobs:
     env:
       CARGO_VERSION: ${{ needs.extract-version.outputs.cargo_version }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v3
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
