@@ -15,7 +15,7 @@ jobs:
     name: Build for Linux
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Install Rust
       uses: actions-rs/toolchain@v1
       with:
@@ -33,9 +33,9 @@ jobs:
         tar -czf paseto_cli-linux-x64.tar.gz paseto_cli
         mv paseto_cli-linux-x64.tar.gz ../../../
     - name: Upload Binary
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
-        name: binaries
+        name: paseto_cli-linux-x64
         path: paseto_cli-linux-x64.tar.gz
 
   build-macos:
@@ -45,7 +45,7 @@ jobs:
       matrix:
         target: [x86_64-apple-darwin, aarch64-apple-darwin]
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Install Rust
       uses: actions-rs/toolchain@v1
       with:
@@ -63,16 +63,16 @@ jobs:
         tar -czf paseto_cli-darwin-${{ matrix.target == 'x86_64-apple-darwin' && 'x64' || 'arm64' }}.tar.gz paseto_cli
         mv paseto_cli-darwin-${{ matrix.target == 'x86_64-apple-darwin' && 'x64' || 'arm64' }}.tar.gz ../../../
     - name: Upload Binary
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
-        name: binaries
+        name: paseto_cli-darwin-${{ matrix.target == 'x86_64-apple-darwin' && 'x64' || 'arm64' }}
         path: paseto_cli-darwin-${{ matrix.target == 'x86_64-apple-darwin' && 'x64' || 'arm64' }}.tar.gz
 
   build-windows:
     name: Build for Windows
     runs-on: windows-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Install Rust
       uses: actions-rs/toolchain@v1
       with:
@@ -90,56 +90,75 @@ jobs:
         7z a paseto_cli-win32-x64.zip paseto_cli.exe
         move paseto_cli-win32-x64.zip ../../../
     - name: Upload Binary
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
-        name: binaries
+        name: paseto_cli-win32-x64
         path: paseto_cli-win32-x64.zip
 
   create-release:
     needs: [build-linux, build-macos, build-windows]
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Download Binaries
-      uses: actions/download-artifact@v2
-      with:
-        name: binaries
+      uses: actions/download-artifact@v3
     - name: Create Release
       id: create_release
       uses: actions/create-release@v1
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
       with:
         tag_name: v${{ github.event.inputs.version }}
         release_name: Release ${{ github.event.inputs.version }}
         draft: false
         prerelease: false
     - name: Upload Release Assets
-      uses: actions/upload-release-asset@v1
+      uses: softprops/action-gh-release@v1
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
       with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./paseto_cli-${{ matrix.os }}-${{ matrix.arch }}.${{ matrix.os == 'win32' && 'zip' || 'tar.gz' }}
-        asset_name: paseto_cli-${{ matrix.os }}-${{ matrix.arch }}.${{ matrix.os == 'win32' && 'zip' || 'tar.gz' }}
-        asset_content_type: ${{ matrix.os == 'win32' && 'application/zip' || 'application/gzip' }}
+        files: |
+          paseto_cli-linux-x64/paseto_cli-linux-x64.tar.gz
+          paseto_cli-darwin-x64/paseto_cli-darwin-x64.tar.gz
+          paseto_cli-darwin-arm64/paseto_cli-darwin-arm64.tar.gz
+          paseto_cli-win32-x64/paseto_cli-win32-x64.zip
+        tag_name: v${{ github.event.inputs.version }}
 
   publish-npm:
     needs: create-release
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Setup Node.js
-      uses: actions/setup-node@v2
+      uses: actions/setup-node@v3
       with:
-        node-version: '14'
+        node-version: '20'  # Use the latest LTS version
         registry-url: 'https://registry.npmjs.org'
     - name: Update package.json version
       run: |
-        npm version ${{ github.event.inputs.version }} --no-git-tag-version
+        current_version=$(node -p "require('./package.json').version")
+        if [ "$current_version" != "${{ github.event.inputs.version }}" ]; then
+          npm version ${{ github.event.inputs.version }} --no-git-tag-version
+          echo "Version updated from $current_version to ${{ github.event.inputs.version }}"
+        else
+          echo "Version is already $current_version, no update needed"
+        fi
     - name: Install dependencies
-      run: npm ci
+      run: |
+        if [ ! -f package-lock.json ]; then
+          echo "package-lock.json not found, running npm install"
+          npm install
+        else
+          echo "package-lock.json found, running npm ci"
+          npm ci
+        fi
     - name: Publish to NPM
-      run: npm publish
+      run: |
+        if npm view . version | grep -q "${{ github.event.inputs.version }}"; then
+          echo "Version ${{ github.event.inputs.version }} is already published on npm"
+        else
+          npm publish
+          echo "Published version ${{ github.event.inputs.version }} to npm"
+        fi
       env:
         NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
