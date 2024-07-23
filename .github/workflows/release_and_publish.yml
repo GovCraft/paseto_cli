@@ -81,7 +81,7 @@ jobs:
             workflow_run_id=$(echo "$artifact_info" | jq -r '.workflow_run.id')
             echo "Artifact $artifact_name already exists from workflow id: $workflow_run_id."
             echo "artifact-exists=true" >> $GITHUB_ENV
-            echo "workflow_run_id=${{ workflow_run_id }}" >> $GITHUB_ENV
+            echo "workflow_run_id=$workflow_run_id" >> $GITHUB_ENV
           else
             echo "Artifact does not exist."
             echo "artifact-exists=false" >> $GITHUB_ENV
