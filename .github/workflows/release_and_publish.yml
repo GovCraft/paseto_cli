@@ -198,6 +198,7 @@ jobs:
       - name: Install dependencies
         env:
           BINARY_DISTRIBUTION_VERSION: ${{ needs.extract-version.outputs.cargo_version }}
+          CI: true
         run: |
           npm install
           npm ci

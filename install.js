@@ -14,6 +14,11 @@ const binaryName = process.platform === 'win32' ? 'paseto_cli.exe' : 'paseto_cli
 const platformSpecificPackageName = BINARY_DISTRIBUTION_PACKAGES[`${process.platform}-${process.arch}`];
 const fallbackBinaryPath = path.join(__dirname, binaryName);
 
+// Skip download in CI environment
+if (process.env.CI) {
+    console.log('CI environment detected. Skipping binary download.');
+    process.exit(0);
+}
 function makeRequest(url) {
     return new Promise((resolve, reject) => {
         https.get(url, (response) => {
