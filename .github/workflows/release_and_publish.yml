@@ -116,7 +116,7 @@ jobs:
           elif [[ "${{ matrix.os }}" == "windows-latest" ]]; then
             cd target/x86_64-pc-windows-msvc/release
             7z a -r paseto_cli-win32-x64.zip paseto_cli.exe
-            move paseto_cli-win32-x64.zip ../../../
+            powershell -command "Move-Item -Path paseto_cli-win32-x64.zip -Destination ../../../"
           fi
         shell: bash
 
