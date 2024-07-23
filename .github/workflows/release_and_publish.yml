@@ -190,13 +190,14 @@ jobs:
           else
             echo "Version is already $current_version, no update needed"
           fi
+      - name: Using Workflow Run ID
+        run: |
+          echo "Downloading artifacts from workflow id: ${{ needs.build.outputs.workflow_run_id }}"
       - name: Download Artifacts
         uses: actions/download-artifact@v4
         with:
           run-id: ${{ needs.build.outputs.workflow_run_id }}
           path: .
-        run: |
-          echo "Downloading artifacts from workflow id: ${{ needs.build.outputs.workflow_run_id }}"
       - name: Install dependencies
         env:
           BINARY_DISTRIBUTION_VERSION: ${{ needs.extract-version.outputs.cargo_version }}
