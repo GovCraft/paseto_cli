@@ -4,8 +4,7 @@ const path = require('path');
 const { execSync } = require('child_process');
 
 const version = '1.0.0-alpha.1'; // Match this with your package version
-const baseUrl = `https://github.com/Govcraft/paseto-cli/releases/download/v${version}`;
-
+const baseUrl = `https://github.com/Govcraft/paseto_cli/releases/download/v${version}`;
 const platform = process.platform;
 const arch = process.arch;
 
