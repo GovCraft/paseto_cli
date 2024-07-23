@@ -1,0 +1,17 @@
+[package]
+name = "paseto_cli"
+version = "0.1.0"
+edition = "2021"
+description = "A command-line tool for generating and validating PASETO v4.local tokens"
+authors = ["Roland Rodriguez <roland@govcraft.ai>"]
+[dependencies]
+rusty_paseto = "0.7.1"
+anyhow = "1.0.86"
+clap = { version = "4.5.9", features = ["cargo", "derive", "wrap_help"] }
+serde_json = "1.0.120"
+time = { version = "0.3.36", features = ["parsing", "formatting"] }
+termcolor = "1.4.1"
+unicode-width = "0.1.13"
+thiserror = "1.0.63"
+textwrap = { version = "0.16.1", features = ["terminal_size"] }
+terminal_size = "0.3.0"
