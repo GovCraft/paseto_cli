@@ -42,6 +42,7 @@ jobs:
             target: [x86_64-unknown-linux-gnu, x86_64-pc-windows-msvc]
           - os: windows-latest
             target: [x86_64-unknown-linux-gnu, x86_64-apple-darwin, aarch64-apple-darwin]
+
     steps:
       - name: Fail if version is blank
         run: |
@@ -50,8 +51,25 @@ jobs:
             exit 1
           fi
           echo "Cargo version is $CARGO_VERSION"
-        shell: ${{ matrix.os == 'windows-latest' && 'powershell' || 'bash' }}
-      - uses: actions/checkout@v3
+        shell: bash
+        if: runner.os != 'Windows'
+      - name: Fail if version is blank
+        run: |
+          if (-not $env:CARGO_VERSION) {
+            Write-Error "Error: CARGO_VERSION is blank."
+            exit 1
+          }
+          Write-Host "Cargo version is $env:CARGO_VERSION"
+        shell: pwsh
+        if: runner.os == 'Windows'
+
+      - name: Try to download existing artifact
+        id: download-artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ matrix.os == 'ubuntu-latest' && 'paseto_cli-linux-x64' || (matrix.os == 'macos-latest' && (matrix.target == 'x86_64-apple-darwin' && 'paseto_cli-darwin-x64' || 'paseto_cli-darwin-arm64')) || 'paseto_cli-win32-x64' }}
+        continue-on-error: true
+
       - name: Check if artifact exists
         id: check-artifact
         run: |
@@ -75,18 +93,24 @@ jobs:
             echo "artifact-exists=false" >> $GITHUB_ENV
           fi
         shell: bash
+
       - name: Install Rust
+        if: env.artifact-exists == 'false'
         uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
           target: ${{ matrix.target }}
           override: true
+
       - name: Build
+        if: env.artifact-exists == 'false'
         uses: actions-rs/cargo@v1
         with:
           command: build
           args: --release --target ${{ matrix.target }}
+
       - name: Package Binary
+        if: env.artifact-exists == 'false'
         run: |
           if [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
             cd target/x86_64-unknown-linux-gnu/release
@@ -102,6 +126,7 @@ jobs:
             move paseto_cli-win32-x64.zip ../../../
           fi
         shell: bash
+
       - name: Upload Binary
         if: env.artifact-exists == 'false'
         uses: actions/upload-artifact@v4
