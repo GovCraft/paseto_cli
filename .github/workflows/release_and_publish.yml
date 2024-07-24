@@ -136,7 +136,7 @@ jobs:
         uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
-          target: ${{ matrix.os }}
+          target: ${{ matrix.target }}
           override: true
 
       - name: Build
@@ -144,7 +144,7 @@ jobs:
         uses: actions-rs/cargo@v1
         with:
           command: build
-          args: --release --target ${{ matrix.os }}
+          args: --release --target ${{ matrix.target }}
       - name: Package Binary
         if: matrix.exists == 'false'
         env:
