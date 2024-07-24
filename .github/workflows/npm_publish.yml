@@ -47,14 +47,18 @@ jobs:
           # Create directories
           mkdir -p ${{ inputs.name }}/bin
           
-          # Extract the tarball
-          tar -xzf ${{ inputs.name }}.${{ inputs.ext }}/${{ inputs.name }}.${{ inputs.ext }} -C ${{ inputs.name }}/bin
+          # Extract the bin
+          if [[ "${{ inputs.ext }}" == "zip" ]]; then
+            7z x ${{ inputs.name }}.${{ inputs.ext }} -o ${{ inputs.name }}/bin
+          else
+            tar -xzf ${{ inputs.name }}.${{ inputs.ext }}/${{ inputs.name }}.${{ inputs.ext }} -C ${{ inputs.name }}/bin
+          fi
           
           # Change the package name in package.json to reflect this optional dependency package
           sed -i 's|"name": "@govcraft/paseto_cli"|"name": "@govcraft/${{ inputs.name }}"|' package.json
           
           # Publish the package
-          npm publish
+          npm publish --access public
           
           # Update GitHub summary
           echo "### Published **@govcraft/${{ inputs.name }}** to **NPM**" >> $GITHUB_STEP_SUMMARY
