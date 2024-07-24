@@ -94,14 +94,14 @@ jobs:
   update-package-json-version:
     name: Update package.json version
     uses: ./.github/workflows/update_package_json_version.yml
-    needs: [ build-jobs, extract-version ]
+    needs: [ extract-version ]
     with:
       version: ${{ needs.extract-version.outputs.cargo_version }}
     secrets:
       token: ${{ secrets.RELEASE_TOKEN }}
 
   create-release:
-    needs: [ update-package-json-version ]
+    needs: [ build-jobs  ]
     runs-on: ubuntu-latest
     steps:
       - name: Download Artifacts

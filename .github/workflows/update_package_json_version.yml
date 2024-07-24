@@ -37,7 +37,7 @@ jobs:
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
             git commit -a -m "chore: workflow update package.json version to $new_version"
             git push
-          esfi
+          else
             echo "Package.json version is already $new_version, no update needed" >> $GITHUB_STEP_SUMMARY
           fi
         shell: bash
