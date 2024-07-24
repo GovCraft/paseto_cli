@@ -31,7 +31,7 @@ jobs:
     needs: extract-version
     with:
       version: ${{ needs.extract-version.outputs.cargo_version }}
-      token: ${{ GITHUB_TOKEN }}
+      token: $GITHUB_TOKEN
   build-matrix:
     name: Define Build Matrix
     runs-on: ubuntu-latest
