@@ -37,46 +37,51 @@ jobs:
       - name: Set matrix
         id: set-matrix
         run: |
-          response=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/repos/${{ github.repository }}/actions/artifacts")  
-   
-          artifact_name="paseto_cli-linux-x64"
-          artifact_info=$(echo "$response" | jq -r '.artifacts[] | select(.name=="'"$artifact_name"'")')
+          response=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/repos/${{ github.repository }}/actions/artifacts")
+  
+          for artifact_name in "paseto_cli-linux-x64" "paseto_cli-darwin" "paseto_cli-win32-x64"; do
+          artifact_info=$(echo "$response" | jq -r '.artifacts[] | select(.name=="'"$artifact_name"'") | select(.expired == false) | select(.expired_at == null)')
           if [ -n "$artifact_info" ]; then
-            workflow_run_id=$(echo "$artifact_info" | jq -r '.workflow_run.id')
-            echo "Artifact $artifact_name already exists from workflow id: $workflow_run_id."
-            echo 'linux-x64={os: "ubuntu-latest",exists:true, run_id:"$workflow_run_id", artifact:"$artifact_name"}' >> $GITHUB_ENV
+          workflow_run_id=$(echo "$artifact_info" | jq -r '.workflow_run.id')
+          echo "Artifact $artifact_name already exists from workflow id: $workflow_run_id."
+          exists="true"
           else
-            echo "Artifact does not exist."
-            echo 'linux-x64={os: "ubuntu-latest",exists:false, run_id:"$workflow_run_id", artifact:"$artifact_name"}' >> $GITHUB_ENV
+          echo "Artifact $artifact_name does not exist."
+          workflow_run_id=""
+          exists="false"
           fi
           
-          artifact_name="paseto_cli-darwin"
-          artifact_info=$(echo "$response" | jq -r '.artifacts[] | select(.name=="'"$artifact_name"'")')
-          if [ -n "$artifact_info" ]; then
-            workflow_run_id=$(echo "$artifact_info" | jq -r '.workflow_run.id')
-            echo "Artifact $artifact_name already exists from workflow id: $workflow_run_id."
-            echo 'darwin={os: "macos-latest",exists:true, run_id:"$workflow_run_id", artifact:"$artifact_name"}' >> $GITHUB_ENV
-          else
-            echo "Artifact does not exist."
-            echo 'darwin={os: "macos-latest",exists:false, run_id:"$workflow_run_id", artifact:"$artifact_name"}' >> $GITHUB_ENV
-          fi
-
-          artifact_name="paseto_cli-win32-x64"
-          artifact_info=$(echo "$response" | jq -r '.artifacts[] | select(.name=="'"$artifact_name"'")')
-          if [ -n "$artifact_info" ]; then
-            workflow_run_id=$(echo "$artifact_info" | jq -r '.workflow_run.id')
-            echo "Artifact $artifact_name already exists from workflow id: $workflow_run_id."
-            echo 'win32-x64={os: "windows-latest",exists:true, run_id:"$workflow_run_id", artifact:"$artifact_name"}' >> $GITHUB_ENV
-          else
-            echo "Artifact does not exist."
-            echo 'win32-x64={os: "windows-latest",exists:false, run_id:"$workflow_run_id", artifact:"$artifact_name"}' >> $GITHUB_ENV
-          fi
+          case $artifact_name in
+          "paseto_cli-linux-x64")
+          os="ubuntu-latest"
+          var_name="linux"
+          ;;
+          "paseto_cli-darwin")
+          os="macos-latest"
+          var_name="darwin"
+          ;;
+          "paseto_cli-win32-x64")
+          os="windows-latest"
+          var_name="win"
+          ;;
+          esac
+          
+          json_value=$(jq -n \
+          --arg os "$os" \
+          --arg exists "$exists" \
+          --arg run_id "$workflow_run_id" \
+          --arg artifact "$artifact_name" \
+          '{os: $os, exists: $exists, run_id: $run_id, artifact: $artifact}')
+          
+          echo "$var_name=$json_value" >> $GITHUB_ENV
+          done
+          
           echo "build_matrix=$(jq -n \
           --arg version "${{ needs.extract-version.outputs.cargo_version }}" \
-          --arg linux "${{ env.linux-x64 }}" \
-          --arg darwin "${{ env.darwin }}" \
-          --arg win "${{ env.win32-x64 }}" \
-          '{version: $version, target: [$linux, $darwin, $win] | map(fromjson)}')" >> $GITHUB_OUTPUT
+          --argjson linux "$linux" \
+          --argjson darwin "$darwin" \
+          --argjson win "$win" \
+          '{version: $version, target: [$linux, $darwin, $win]}')" >> $GITHUB_OUTPUT
         shell: bash
 
   build:
