@@ -128,11 +128,11 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout code
-        if: matrix.exists == false
+        if: matrix.exists == 'false'
         uses: actions/checkout@v4
 
       - name: Install Rust
-        if: matrix.exists == false
+        if: matrix.exists == 'false'
         uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
@@ -140,13 +140,13 @@ jobs:
           override: true
 
       - name: Build
-        if: matrix.exists == false
+        if: matrix.exists == 'false'
         uses: actions-rs/cargo@v1
         with:
           command: build
           args: --release --target ${{ matrix.os }}
       - name: Package Binary
-        if: matrix.exists == false
+        if: matrix.exists == 'false'
         env:
           filename: ${{ matrix.artifact_name }}
         run: |
@@ -167,7 +167,7 @@ jobs:
         shell: bash
 
       - name: Upload Binary
-        if: matrix.exists == false
+        if: matrix.exists == 'false'
         uses: actions/upload-artifact@v4
         with:
           name: ${{ env.filename }}
