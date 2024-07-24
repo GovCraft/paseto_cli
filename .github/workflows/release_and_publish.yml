@@ -36,21 +36,24 @@ jobs:
             ext: tar.gz
             on: ubuntu-latest
             artifact: paseto_cli-linux-x64
-#          - target: x86_64-apple-darwin
-#            os: darwin
-#            arch: x64
-#            ext: tar.gz
-#            artifact: paseto_cli-darwin-x64
-#          - target: aarch64-apple-darwin
-#            os: darwin
-#            arch: arm64
-#            ext: tar.gz
-#            artifact: paseto_cli-darwin-aarch64
-#          - target: x86_64-pc-windows-msvc
-#            os: win32
-#            arch: x64
-#            ext: zip
-#            artifact: paseto_cli-win32-x64
+          - target: x86_64-apple-darwin
+            os: darwin
+            arch: x64
+            ext: tar.gz
+            on: mac-latest
+            artifact: paseto_cli-darwin-x64
+          - target: aarch64-apple-darwin
+            os: darwin
+            arch: aarch64
+            ext: tar.gz
+            on: mac-latest
+            artifact: paseto_cli-darwin-aarch64
+          - target: x86_64-pc-windows-msvc
+            os: win32
+            arch: x64
+            ext: zip
+            on: windows-latest
+            artifact: paseto_cli-win32-x64
 
     runs-on: ${{ matrix.on }}
     env:
@@ -118,6 +121,9 @@ jobs:
           token: ${{ secrets.RELEASE_TOKEN }}
           files: |
             paseto_cli-linux-x64.tar.gz
+            paseto_cli-darwin-x64.tar.gz
+            paseto_cli-darwin-aarch64.tar.gz
+            paseto_cli-win32-x64.zip
 
   npm-publish:
     name: Publish to NPM
@@ -135,6 +141,12 @@ jobs:
         include:
           - ext: tar.gz
             artifact: paseto_cli-linux-x64
+          - ext: tar.gz
+            artifact: paseto_cli-darwin-x64
+          - ext: tar.gz
+            artifact: paseto_cli-darwin-aarch64
+          - ext: zip
+            artifact: paseto_cli-win32-x64
 
 
 #  publish-npm:
