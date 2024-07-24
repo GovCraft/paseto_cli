@@ -142,8 +142,11 @@ jobs:
         run: |
           mkdir -p paseto_cli-linux-x64/bin
           tar -xzf paseto_cli-linux-x64.tar.gz/paseto_cli-linux-x64.tar.gz -C paseto_cli-linux-x64/bin
+          # Change the package name in package.json to reflect this optional dependency package
+          sed -i 's/"name": "@govcraft/paseto_cli"/"name": "@govcraft/paseto_cli-linux-x64"/' package.json
+                                                    
           npm publish
-          echo "### Published **paseto_cli-linux-x64** to **NPM**" >> $GITHUB_STEP_SUMMARY
+          echo "### Published **@govcraft/paseto_cli-linux-x64** to **NPM**" >> $GITHUB_STEP_SUMMARY
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 #      - name: Publish macOS x64 Binary
