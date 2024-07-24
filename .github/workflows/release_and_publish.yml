@@ -129,11 +129,10 @@ jobs:
         with:
           command: build
           args: --release --target ${{ matrix.os == 'ubuntu-latest' && 'x86_64-unknown-linux-gnu' || matrix.os == 'macos-latest' && 'x86_64-apple-darwin' || 'x86_64-pc-windows-msvc' }}
-        env:
-          filename: ${{ matrix.artifact_name }}.${{ matrix.ext }}
       - name: Package Binary
         if: matrix.exists == false
         run: |
+          echo "filename=${{ matrix.artifact_name }}.${{ matrix.ext }}" | GITHUB_ENV 
           if [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
             cd target/x86_64-unknown-linux-gnu/release
             tar -czf paseto_cli-linux-x64.tar.gz paseto_cli
