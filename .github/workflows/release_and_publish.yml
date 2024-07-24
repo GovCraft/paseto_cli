@@ -40,50 +40,49 @@ jobs:
     name: Define Build Matrix
     runs-on: ubuntu-latest
     needs: [extract-version, get-artifact-json]
-
     outputs:
-      matrix: ${{ steps.set-matrix.outputs.build_matrix }}
+      target-matrix: ${{ steps.set-matrix.outputs.build_matrix }}
 
     steps:
       - name: Set matrix
         id: set-matrix
         run: |
-          response = ${{ needs.get-artifact-json.outputs.artifact_json }}
-   
-          artifact_name="paseto_cli-linux-x64"
-          artifact_info=$(echo "$response" | jq -r '.artifacts[] | select(.name=="'"$artifact_name"'")')
-          if [ -n "$artifact_info" ]; then
-            workflow_run_id=$(echo "$artifact_info" | jq -r '.workflow_run.id')
-            echo "Artifact $artifact_name already exists from workflow id: $workflow_run_id."
-            echo 'linux-x64={os: "ubuntu-latest",exists:true, run_id:"$workflow_run_id", artifact:"$artifact_name"}' >> $GITHUB_ENV
-          else
-            echo "Artifact does not exist."
-            echo 'linux-x64={os: "ubuntu-latest",exists:false, run_id:"$workflow_run_id", artifact:"$artifact_name"}' >> $GITHUB_ENV
-          fi
+          response=${{ needs.get-artifact-json.outputs.artifact_json }}
           
-          artifact_name="paseto_cli-darwin"
-          artifact_info=$(echo "$response" | jq -r '.artifacts[] | select(.name=="'"$artifact_name"'")')
-          if [ -n "$artifact_info" ]; then
-            workflow_run_id=$(echo "$artifact_info" | jq -r '.workflow_run.id')
-            echo "Artifact $artifact_name already exists from workflow id: $workflow_run_id."
-            echo 'darwin={os: "macos-latest",exists:true, run_id:"$workflow_run_id", artifact:"$artifact_name"}' >> $GITHUB_ENV
-          else
-            echo "Artifact does not exist."
-            echo 'darwin={os: "macos-latest",exists:false, run_id:"$workflow_run_id", artifact:"$artifact_name"}' >> $GITHUB_ENV
-          fi
+          declare -A artifact_info
+          for artifact_name in "paseto_cli-linux-x64" "paseto_cli-darwin" "paseto_cli-win32-x64"; do
+            info=$(echo "$response" | jq -r --arg name "$artifact_name" '.artifacts[] | select(.name==$name)')
+            if [ -n "$info" ]; then
+              workflow_run_id=$(echo "$info" | jq -r '.workflow_run.id')
+              echo "Artifact $artifact_name already exists from workflow id: $workflow_run_id."
+              artifact_info[$artifact_name]=$(echo "{\"os\":\"$(get_os $artifact_name)\",\"exists\":true,\"run_id\":\"$workflow_run_id\",\"artifact\":\"$artifact_name\"}")
+            else
+              echo "Artifact $artifact_name does not exist."
+              artifact_info[$artifact_name]=$(echo "{\"os\":\"$(get_os $artifact_name)\",\"exists\":false,\"artifact\":\"$artifact_name\"}")
+            fi
+          done
+          
+          linux_x64=${artifact_info["paseto_cli-linux-x64"]}
+          darwin=${artifact_info["paseto_cli-darwin"]}
+          win32_x64=${artifact_info["paseto_cli-win32-x64"]}
+          
+          build_matrix=$(jq -n --arg version "${{ needs.extract-version.outputs.cargo_version }}" --argjson targets "[$linux_x64,$darwin,$win32_x64]" '{version: $version, target: $targets}')
+          
+          echo "build_matrix=$build_matrix" >> $GITHUB_OUTPUT
 
-          artifact_name="paseto_cli-win32-x64"
-          artifact_info=$(echo "$response" | jq -r '.artifacts[] | select(.name=="'"$artifact_name"'")')
-          if [ -n "$artifact_info" ]; then
-            workflow_run_id=$(echo "$artifact_info" | jq -r '.workflow_run.id')
-            echo "Artifact $artifact_name already exists from workflow id: $workflow_run_id."
-            echo 'win32-x64={os: "windows-latest",exists:true, run_id:"$workflow_run_id", artifact:"$artifact_name"}' >> $GITHUB_ENV
-          else
-            echo "Artifact does not exist."
-            echo 'win32-x64={os: "windows-latest",exists:false, run_id:"$workflow_run_id", artifact:"$artifact_name"}' >> $GITHUB_ENV
-          fi
-          echo "build_matrix='version:${{ needs.extract-version.outputs.cargo_version }},target:[${{ env.linux-x64 }},${{ env.darwin }},${{ env.win32-x64 }}]'" >> $GITHUB_OUTPUT
+        shell: bash
 
+      - name: get_os
+        run: |
+          get_os() {
+            case "$1" in
+              paseto_cli-linux-x64) echo "ubuntu-latest" ;;
+              paseto_cli-darwin) echo "macos-latest" ;;
+              paseto_cli-win32-x64) echo "windows-latest" ;;
+              *) echo "unknown" ;;
+            esac
+          }
+          export -f get_os
         shell: bash
 
   build:
@@ -92,7 +91,7 @@ jobs:
     needs: define-build-matrix
     strategy:
       matrix:
-        target: ${{ fromJSON(needs.define-build-matrix.outputs.build_matrix) }}
+        target: ${{ fromJSON(needs.define-build-matrix.outputs.target-matrix) }}
 
     steps:
       - name: Checkout code
