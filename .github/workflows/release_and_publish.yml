@@ -121,11 +121,7 @@ jobs:
           token: ${{ secrets.RELEASE_TOKEN }}
           merge-multiple: true
           path: ./
-          files: |
-            paseto_cli-linux-x64.tar.gz
-            paseto_cli-darwin-x64.tar.gz
-            paseto_cli-darwin-aarch64.tar.gz
-            paseto_cli-win32-x64.zip
+
 
   npm-publish:
     name: Publish to NPM
