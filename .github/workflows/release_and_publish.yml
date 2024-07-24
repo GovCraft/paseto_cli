@@ -71,8 +71,12 @@ jobs:
             echo "Artifact does not exist."
             echo 'win32-x64={os: "windows-latest",exists:false, run_id:"$workflow_run_id", artifact:"$artifact_name"}' >> $GITHUB_ENV
           fi
-          echo "build_matrix='version:${{ needs.extract-version.outputs.cargo_version }},target:[${{ env.linux-x64 }},${{ env.darwin }},${{ env.win32-x64 }}]'" >> $GITHUB_OUTPUT
-
+          echo "build_matrix=$(jq -n \
+          --arg version "${{ needs.extract-version.outputs.cargo_version }}" \
+          --arg linux "${{ env.linux-x64 }}" \
+          --arg darwin "${{ env.darwin }}" \
+          --arg win "${{ env.win32-x64 }}" \
+          '{version: $version, target: [$linux, $darwin, $win] | map(fromjson)}')" >> $GITHUB_OUTPUT
         shell: bash
 
   build:
@@ -80,9 +84,7 @@ jobs:
     runs-on: ${{ matrix.target.os }}
     needs: define-build-matrix
     strategy:
-      matrix:
-        target: ${{ fromJSON(needs.define-build-matrix.outputs.target-matrix) }}
-
+      matrix: ${{ fromJSON(needs.define-build-matrix.outputs.target-matrix) }}
     steps:
       - name: Checkout code
         if: matrix.target.exists == 'false'
