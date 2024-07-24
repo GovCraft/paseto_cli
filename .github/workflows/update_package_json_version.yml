@@ -21,22 +21,23 @@ jobs:
           token: ${{ secrets.token }}
       - name: Update package.json version
         run: |
-          # Fetch current package.json content
-           package_json=$(cat package.json)
+          package_json=$(cat package.json)
           
-           # Update the version and optional dependencies
-           new_version="${{ inputs.version }}"
-           updated_package_json=$(echo "$package_json" | jq --arg new_version "$new_version" '.version = $new_version | .optionalDependencies."paseto_cli-linux-x64" = $new_version | .optionalDependencies."paseto_cli-darwin-x64" = $new_version | .optionalDependencies."paseto_cli-darwin-aarch64" = $new_version | .optionalDependencies."paseto_cli-windows-x64" = $new_version')
+          # Update the version and optional dependencies
+          new_version="${{ inputs.version }}"
+          updated_package_json=$(echo "$package_json" | jq --arg new_version "$new_version" '.version = $new_version | .optionalDependencies."paseto_cli-linux-x64" = $new_version | .optionalDependencies."paseto_cli-darwin-x64" = $new_version | .optionalDependencies."paseto_cli-darwin-aarch64" = $new_version | .optionalDependencies."paseto_cli-windows-x64" = $new_version')
           
-           # Save the updated package.json content
-           echo "$updated_package_json" > package.json
+          # Save the updated package.json content
+          echo "$updated_package_json" > package.json
           
-           # Check if changes were made and commit them
-           if ! git diff --quiet; then
-             echo "Version updated to $new_version and optional dependencies updated" >> $GITHUB_STEP_SUMMARY
-             git config user.name "github-actions[bot]"
-             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-             git commit -a -m "chore: workflow update package.json version to $new_version"
-             git push
-           else
-             echo "Package.json version is already $new_version, no update needed" >> $GITHUB_STEP_SUMMARY
+          # Check if changes were made and commit them
+          if ! git diff --quiet; then
+            echo "Version updated to $new_version and optional dependencies updated" >> $GITHUB_STEP_SUMMARY
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git commit -a -m "chore: workflow update package.json version to $new_version"
+            git push
+          esfi
+            echo "Package.json version is already $new_version, no update needed" >> $GITHUB_STEP_SUMMARY
+          fi
+        shell: bash
