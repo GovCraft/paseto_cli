@@ -133,6 +133,8 @@ jobs:
       version: ${{ needs.extract-version.outputs.cargo_version }}
       name: ${{ matrix.artifact }}
       ext: ${{ matrix.ext }}
+      os: ${{ matrix.os }}
+      cpu: ${{ matrix.arch }}
     secrets:
       token: ${{ secrets.RELEASE_TOKEN }}
       npm_token: ${{ secrets.NPM_TOKEN }}
