@@ -62,8 +62,8 @@ jobs:
               echo "Artifact $artifact_name already exists from workflow id: $workflow_run_id."
               exists="true"
             else
-              echo "Artifact $artifact_name does not exist or has expired."
-              workflow_run_id=""
+              echo "Artifact $artifact_name does not exist or has expired so using workflow_run_id ${{ github.run_id }}" >> $GITHUB_STEP_SUMMARY
+              workflow_run_id="${{ github.run_id }}"
               exists="false"
             fi
 
