@@ -26,7 +26,6 @@ jobs:
           echo "### Release Build: v$version" >> $GITHUB_STEP_SUMMARY
           echo "cargo_version=$version" >> $GITHUB_OUTPUT
 
-
   build-jobs:
     strategy:
       matrix:
@@ -101,7 +100,7 @@ jobs:
       token: ${{ secrets.RELEASE_TOKEN }}
 
   create-release:
-    needs: [ build-jobs, extract-version, build-matrix ]
+    needs: [ build-jobs, extract-version ]
     runs-on: ubuntu-latest
     steps:
       - name: Download Artifacts
@@ -118,7 +117,7 @@ jobs:
           token: ${{ secrets.RELEASE_TOKEN }}
 
   publish-npm:
-    needs: [ create-release, extract-version, build-jobs ]
+    needs: [ create-release, extract-version, update-package-json-version ]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
