@@ -31,7 +31,7 @@ jobs:
     needs: extract-version
     with:
       version: ${{ needs.extract-version.outputs.cargo_version }}
-      secrets:
+    secrets:
       token: ${{ secrets.RELEASE_TOKEN }}
   build-matrix:
     name: Define Build Matrix
