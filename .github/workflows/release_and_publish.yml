@@ -121,19 +121,15 @@ jobs:
     needs: [ create-release, extract-version, update-package-json-version ]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
           registry-url: 'https://registry.npmjs.org'
-      - name: Using Workflow Run ID
-        run: |
-          echo "Downloading artifacts from workflow id: ${{ needs.build-jobs.outputs.workflow_run_id }}"
       - name: Download Artifacts
         uses: actions/download-artifact@v4
         with:
-          run-id: ${{ needs.build-jobs.outputs.workflow_run_id }}
+          merge-multiple: true
           path: .
       - name: Install dependencies
         env:
@@ -148,6 +144,7 @@ jobs:
           tar -xzf paseto_cli-linux-x64.tar.gz -C paseto_cli-linux-x64/bin
           cd paseto_cli-linux-x64
           npm publish
+          echo "### Published **paseto_cli-linux-x64** to **NPM**" >> $GITHUB_STEP_SUMMARY
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 #      - name: Publish macOS x64 Binary
