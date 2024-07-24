@@ -102,7 +102,7 @@ jobs:
           --argjson win "${artifact_data[win]}" \
           '{version: $version, target: [$linux, $darwin, $win]}')
           
-          echo "build_matrix<<EOF" >> $GITHUB_OUTPUT
+          echo "target-matrix<<EOF" >> $GITHUB_OUTPUT
           echo "$build_matrix" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
           
@@ -111,41 +111,56 @@ jobs:
 
   build:
     name: Build and Package
-    runs-on: ${{ matrix.target.os }}
     needs: define-build-matrix
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up matrix
+        id: set-matrix
+        run: |
+          matrix=$(echo '${{ needs.define-build-matrix.outputs.target-matrix }}' | jq -c '.target')
+          echo "matrix=$matrix" >> $GITHUB_OUTPUT
+
+      - name: Debug matrix
+        run: echo '${{ steps.set-matrix.outputs.matrix }}'
+
+  matrix-jobs:
+    needs: build
     strategy:
-      matrix: ${{ fromJSON(needs.define-build-matrix.outputs.target-matrix) }}
+      matrix:
+        include: ${{ fromJson(needs.build.outputs.matrix) }}
+    runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout code
-        if: matrix.target.exists == 'false'
+        if: matrix.exists == 'false'
         uses: actions/checkout@v4
+
       - name: Install Rust
-        if: matrix.target.exists == 'false'
+        if: matrix.exists == 'false'
         uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
-          target: ${{ matrix.target.os == 'ubuntu-latest' && 'x86_64-unknown-linux-gnu' || matrix.target.os == 'macos-latest' && 'x86_64-apple-darwin' || 'x86_64-pc-windows-msvc' }}
+          target: ${{ matrix.os == 'ubuntu-latest' && 'x86_64-unknown-linux-gnu' || matrix.os == 'macos-latest' && 'x86_64-apple-darwin' || 'x86_64-pc-windows-msvc' }}
           override: true
 
       - name: Build
-        if: matrix.target.exists == 'false'
+        if: matrix.exists == 'false'
         uses: actions-rs/cargo@v1
         with:
           command: build
-          args: --release --target ${{ matrix.target.os == 'ubuntu-latest' && 'x86_64-unknown-linux-gnu' || matrix.target.os == 'macos-latest' && 'x86_64-apple-darwin' || 'x86_64-pc-windows-msvc' }}
+          args: --release --target ${{ matrix.os == 'ubuntu-latest' && 'x86_64-unknown-linux-gnu' || matrix.os == 'macos-latest' && 'x86_64-apple-darwin' || 'x86_64-pc-windows-msvc' }}
 
       - name: Package Binary
-        if: matrix.target.exists == 'false'
+        if: matrix.exists == 'false'
         run: |
-          if [[ "${{ matrix.target.os }}" == "ubuntu-latest" ]]; then
+          if [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
             cd target/x86_64-unknown-linux-gnu/release
             tar -czf paseto_cli-linux-x64.tar.gz paseto_cli
             mv paseto_cli-linux-x64.tar.gz ../../../
-          elif [[ "${{ matrix.target.os }}" == "macos-latest" ]]; then
+          elif [[ "${{ matrix.os }}" == "macos-latest" ]]; then
             cd target/x86_64-apple-darwin/release
             tar -czf paseto_cli-darwin.tar.gz paseto_cli
             mv paseto_cli-darwin.tar.gz ../../../
-          elif [[ "${{ matrix.target.os }}" == "windows-latest" ]]; then
+          elif [[ "${{ matrix.os }}" == "windows-latest" ]]; then
             cd target/x86_64-pc-windows-msvc/release
             7z a -r paseto_cli-win32-x64.zip paseto_cli.exe
             powershell -command "Move-Item -Path paseto_cli-win32-x64.zip -Destination ../../../"
@@ -153,11 +168,11 @@ jobs:
         shell: bash
 
       - name: Upload Binary
-        if: matrix.target.exists == 'false'
+        if: matrix.exists == 'false'
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ matrix.target.artifact_name }}
-          path: ${{ matrix.target.os == 'ubuntu-latest' && 'paseto_cli-linux-x64.tar.gz' || matrix.target.os == 'macos-latest' && 'paseto_cli-darwin.tar.gz' || 'paseto_cli-win32-x64.zip' }}
+          name: ${{ matrix.artifact }}
+          path: ${{ matrix.os == 'ubuntu-latest' && 'paseto_cli-linux-x64.tar.gz' || matrix.os == 'macos-latest' && 'paseto_cli-darwin.tar.gz' || 'paseto_cli-win32-x64.zip' }}
           compression-level: 9
   create-release:
     needs: [ build, extract-version ]
