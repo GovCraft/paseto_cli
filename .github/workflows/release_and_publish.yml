@@ -82,9 +82,9 @@ jobs:
             echo "Artifact does not exist."
             echo 'win32-x64={os: "windows-latest",exists:false, run_id:"$workflow_run_id", artifact:"$artifact_name"}' >> $GITHUB_ENV
           fi
+          echo "build_matrix='version:${{ needs.extract-version.outputs.cargo_version }},target:[${{ env.linux-x64 }},${{ env.darwin }},${{ env.win32-x64 }}]'" >> $GITHUB_OUTPUT
 
         shell: bash
-          echo "build_matrix='version:${{ needs.extract-version.outputs.cargo_version }},target:[${{ env.linux-x64 }},${{ env.darwin }},${{ env.win32-x64 }}]'" >> $GITHUB_OUTPUT
 
   build:
     name: Build and Package
