@@ -43,12 +43,7 @@ jobs:
           # Validate JSON response
           if ! echo "$response" | jq -e . >/dev/null 2>&1; then
           echo "Error: Invalid JSON response"
-          exit 1
-          fi
-          
-          # Check if 'artifacts' array exists and is not empty
-          if [ "$(echo "$response" | jq 'has("artifacts")')" != "true" ] || [ "$(echo "$response" | jq '.artifacts | length')" -eq 0 ]; then
-          echo "Error: No artifacts found in the response"
+          echo "$response"
           exit 1
           fi
           
@@ -56,7 +51,7 @@ jobs:
           
           for artifact_name in "paseto_cli-linux-x64" "paseto_cli-darwin" "paseto_cli-win32-x64"; do
           artifact_info=$(echo "$response" | jq -r --arg name "$artifact_name" '
-          .artifacts
+          .artifacts // []
           | map(select(.name == $name and (.expired == false or .expired == null) and (.expired_at == null or .expired_at == "")))
           | sort_by(.created_at)
           | reverse
