@@ -127,6 +127,10 @@ jobs:
         with:
           node-version: '20'
           registry-url: 'https://registry.npmjs.org'
+      - name: Download Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: .
       - name: Install dependencies
         env:
           BINARY_DISTRIBUTION_VERSION: ${{ needs.extract-version.outputs.cargo_version }}
