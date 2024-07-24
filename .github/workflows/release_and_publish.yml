@@ -38,7 +38,7 @@ jobs:
         id: set-matrix
         run: |
           response=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/repos/${{ github.repository }}/actions/artifacts")
-  
+          
           for artifact_name in "paseto_cli-linux-x64" "paseto_cli-darwin" "paseto_cli-win32-x64"; do
           artifact_info=$(echo "$response" | jq -r '.artifacts[] | select(.name=="'"$artifact_name"'") | select(.expired == false) | select(.expired_at == null)')
           if [ -n "$artifact_info" ]; then
@@ -48,6 +48,7 @@ jobs:
           else
           echo "Artifact $artifact_name does not exist."
           workflow_run_id=""
+          
           exists="false"
           fi
           
@@ -73,15 +74,33 @@ jobs:
           --arg artifact "$artifact_name" \
           '{os: $os, exists: $exists, run_id: $run_id, artifact: $artifact}')
           
-          echo "$var_name=$json_value" >> $GITHUB_ENV
+          echo "$var_name='$json_value'" >> $GITHUB_ENV
+          echo "Debug: $var_name = $json_value"
           done
+        
+          # Print environment variables for debugging
+          echo "Debug: Environment variables:"
+          env | grep -E 'linux|darwin|win'
           
-          echo "build_matrix=$(jq -n \
+          # Use eval to get the actual content of the variables
+          linux_content=$(eval echo \$$linux)
+          darwin_content=$(eval echo \$$darwin)
+          win_content=$(eval echo \$$win)
+        
+          echo "Debug: linux = $linux_content"
+          echo "Debug: darwin = $darwin_content"
+          echo "Debug: win = $win_content"
+                       
+          build_matrix=$(jq -n \
           --arg version "${{ needs.extract-version.outputs.cargo_version }}" \
-          --argjson linux "$linux" \
-          --argjson darwin "$darwin" \
-          --argjson win "$win" \
-          '{version: $version, target: [$linux, $darwin, $win]}')" >> $GITHUB_OUTPUT
+          --argjson linux "$linux_content" \
+          --argjson darwin "$darwin_content" \
+          --argjson win "$win_content" \
+          '{version:
+          $version, target: [ $linux, $darwin, $win ] }')
+        
+          echo "build_matrix=$build_matrix" >> $GITHUB_OUTPUT
+          echo "Debug: build_matrix = $build_matrix"
         shell: bash
 
   build:
