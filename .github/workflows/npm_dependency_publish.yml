@@ -53,12 +53,8 @@ jobs:
       - name: Publish Binary
         run: |
 
-          npm set init-author-name "Govcraft"
-          npm set init-author-email "roland@govcraft.ai"
-          npm set init-version ${{ inputs.name }}
-          npm set init-name "@govcraft/${{ inputs.name }}"
-          npm set init-os ${{ inputs.os }}
-          npm set init-cpu ${{ inputs.cpu }}
+          # Custom package.json
+          echo '{"name": "@govcraft/${{ inputs.name }}", "version": "${{ inputs.version }}", "os": ["${{ inputs.os }}"], "cpu": ["${{ inputs.cpu }}"]}', "author": {"name": "Govcraft", "email": "roland@govcraft.ai"}} | jq . > package.json
           
           # Publish the package
           npm publish --access public
