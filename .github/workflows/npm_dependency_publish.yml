@@ -54,7 +54,7 @@ jobs:
         run: |
 
           # Custom package.json
-          echo '{"name": "@govcraft/${{ inputs.name }}", "version": "${{ inputs.version }}", "os": ["${{ inputs.os }}"], "cpu": ["${{ inputs.cpu }}"]}', "author": {"name": "Govcraft", "email": "roland@govcraft.ai"}} | jq . > package.json
+          echo '{"name": "@govcraft/${{ inputs.name }}", "version": "${{ inputs.version }}", "os": ["${{ inputs.os }}"], "cpu": ["${{ inputs.cpu }}"], "author": {"name": "Govcraft", "email": "roland@govcraft.ai"}}' | jq . > package.json
           
           # Publish the package
           npm publish --access public
