@@ -104,7 +104,7 @@ jobs:
       token: ${{ secrets.RELEASE_TOKEN }}
 
   create-release:
-    needs: [ update-package-json-version ]
+    needs: [ update-package-json-version, extract-version ]
     runs-on: ubuntu-latest
     steps:
       - name: Download Artifacts
