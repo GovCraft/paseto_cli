@@ -1,0 +1,31 @@
+name: Release and Publish
+
+on:
+  workflow_call:
+    inputs:
+      version:
+        required: true
+        type: string
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  update_and_commit_version:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Update package.json version
+        run: |
+          current_version=$(node -p "require('./package.json').version")
+          if [ "$current_version" != "${{ inputs.version }}" ]; then
+            npm version ${{ inputs.version }} --no-git-tag-version
+            echo "Version updated from $current_version to ${{ inputs.version }}"
+          else
+            echo "Version is already $current_version, no update needed"
+          fi
+          
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -a -m "chore: workflow update package.json version to ${{ inputs.version }}"
+          git push
