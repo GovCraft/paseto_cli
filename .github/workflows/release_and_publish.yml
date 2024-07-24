@@ -126,6 +126,8 @@ jobs:
     strategy:
       matrix: ${{ fromJson(needs.build-matrix.outputs.target-matrix) }}
     runs-on: ${{ matrix.os }}
+    env:
+      filename: ${{ matrix.artifact_name }}
     steps:
       - name: Checkout code
         if: matrix.exists == 'false'
@@ -147,8 +149,6 @@ jobs:
           args: --release --target ${{ matrix.target }}
       - name: Package Binary
         if: matrix.exists == 'false'
-        env:
-          filename: ${{ matrix.artifact_name }}
         run: |
           if [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
             cd target/x86_64-unknown-linux-gnu/release
