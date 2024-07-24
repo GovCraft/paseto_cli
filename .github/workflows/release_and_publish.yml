@@ -31,8 +31,7 @@ jobs:
     needs: extract-version
     with:
       version: ${{ needs.extract-version.outputs.cargo_version }}
-      secrets:
-        token: $RELEASE_TOKEN
+      token: ${{ secrets.RELEASE_TOKEN }}
   build-matrix:
     name: Define Build Matrix
     runs-on: ubuntu-latest
