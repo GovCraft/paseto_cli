@@ -46,7 +46,7 @@ jobs:
           
           # Extract the binary
           if [[ "${{ inputs.ext }}" == "zip" ]]; then
-            7z x ${{ inputs.name }}.${{ inputs.ext }} -o bin
+            7z x ${{ inputs.name }}.${{ inputs.ext }} -obin
           else
             tar -xzf ${{ inputs.name }}.${{ inputs.ext }}/${{ inputs.name }}.${{ inputs.ext }} -C bin
           fi
