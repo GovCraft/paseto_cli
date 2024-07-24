@@ -107,8 +107,7 @@ jobs:
   build-jobs:
     needs: build-matrix
     strategy:
-      matrix:
-        include: ${{ fromJson(needs.build-matrix.outputs.target-matrix) }}
+      matrix: ${{ fromJson(needs.build-matrix.outputs.target-matrix) }}
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout code
