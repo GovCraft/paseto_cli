@@ -24,12 +24,12 @@ jobs:
           current_version=$(node -p "require('./package.json').version")
           if [ "$current_version" != "${{ inputs.version }}" ]; then
             npm version ${{ inputs.version }} --no-git-tag-version
-            echo "Version updated from $current_version to ${{ inputs.version }}"
+            echo "Version updated from $current_version to ${{ inputs.version }}" >> $GITHUB_STEP_SUMMARY
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git commit -a -m "chore: workflow update package.json version to ${{ inputs.version }}"
+            git push
           else
-            echo "Version is already $current_version, no update needed"
+            echo "Package.json version is already $current_version, no update needed" >> $GITHUB_STEP_SUMMARY
           fi
           
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git commit -a -m "chore: workflow update package.json version to ${{ inputs.version }}"
-          git push

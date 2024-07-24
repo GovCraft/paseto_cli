@@ -25,6 +25,7 @@ jobs:
           fi
           echo "### Release Build: v$version" >> $GITHUB_STEP_SUMMARY
           echo "cargo_version=$version" >> $GITHUB_OUTPUT
+
   update-package-json-version:
     name: Update package.json version
     uses: ./.github/workflows/update_package_json_version.yml
@@ -33,6 +34,7 @@ jobs:
       version: ${{ needs.extract-version.outputs.cargo_version }}
     secrets:
       token: ${{ secrets.RELEASE_TOKEN }}
+
   build-matrix:
     name: Define Build Matrix
     runs-on: ubuntu-latest
@@ -181,6 +183,7 @@ jobs:
           name: ${{ env.filename }}
           path: ${{ env.filename }}
           compression-level: 9
+
   create-release:
     needs: [ build-jobs, extract-version, build-matrix ]
     runs-on: ubuntu-latest
@@ -198,11 +201,8 @@ jobs:
           tag_name: v${{ needs.extract-version.outputs.cargo_version }}
           name: Release ${{ needs.extract-version.outputs.cargo_version }}
           draft: false
-          prerelease: false
+          prerelease: true
           token: ${{ secrets.RELEASE_TOKEN }}
-          files: |
-            *.tar.gz
-            *.zip
 
   publish-npm:
     needs: [ create-release, extract-version, build-jobs ]
