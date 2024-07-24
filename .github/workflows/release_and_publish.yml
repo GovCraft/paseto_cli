@@ -75,13 +75,13 @@ jobs:
         run: |
           cd target/${{ matrix.target }}/release
           if [[ "${{ matrix.os }}" == "win32" ]]; then
-            7z a -r $filename paseto_cli.exe
+            7z a -r ${{ env.filename }} paseto_cli.exe
             powershell -command "Move-Item -Path $filename -Destination ../../../"
           else
-            tar -czf $filename paseto_cli
-            mv $filename ../../../
+            tar -czf ${{ env.filename }} paseto_cli
+            mv ${{ env.filename }} ../../../
           fi
-          echo "### Artifact **$filename** created for **${{ matrix.target }}**" >> $GITHUB_STEP_SUMMARY
+          echo "### Artifact **${{ env.filename }}** created for **${{ matrix.target }}**" >> $GITHUB_STEP_SUMMARY
         shell: bash
 
       - name: Upload Binary
