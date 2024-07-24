@@ -84,7 +84,6 @@ jobs:
           fi
 
         shell: bash
-          echo "build_matrix.${{ matrix.arch }}=" >> $GITHUB_ENV
           echo "build_matrix='version:${{ needs.extract-version.outputs.cargo_version }},target:[${{ env.linux-x64 }},${{ env.darwin }},${{ env.win32-x64 }}]'" >> $GITHUB_OUTPUT
 
   build:
