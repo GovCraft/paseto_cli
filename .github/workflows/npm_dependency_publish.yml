@@ -12,6 +12,12 @@ on:
       ext:
         required: true
         type: string
+      os:
+        required: true
+        type: string
+      cpu:
+        required: true
+        type: string
     secrets:
       npm_token:
         required: true
@@ -24,7 +30,6 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -34,28 +39,24 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           path: .
-      - name: Install dependencies
-        env:
-          BINARY_DISTRIBUTION_VERSION: ${{ inputs.version }}
-          CI: true
-        run: |
-          npm install
-          npm ci
-          echo "### Installed dependencies for **@govcraft/${{ inputs.name }}**" >> $GITHUB_STEP_SUMMARY
       - name: Publish Binary
         run: |
           # Create directories
-          mkdir -p ${{ inputs.name }}/bin
+          mkdir -p bin
           
-          # Extract the bin
+          # Extract the binary
           if [[ "${{ inputs.ext }}" == "zip" ]]; then
-            7z x ${{ inputs.name }}.${{ inputs.ext }} -o ${{ inputs.name }}/bin
+            7z x ${{ inputs.name }}.${{ inputs.ext }} -o bin
           else
-            tar -xzf ${{ inputs.name }}.${{ inputs.ext }}/${{ inputs.name }}.${{ inputs.ext }} -C ${{ inputs.name }}/bin
+            tar -xzf ${{ inputs.name }}.${{ inputs.ext }}/${{ inputs.name }}.${{ inputs.ext }} -C bin
           fi
-          
-          # Change the package name in package.json to reflect this optional dependency package
-          sed -i 's|"name": "@govcraft/paseto_cli"|"name": "@govcraft/${{ inputs.name }}"|' package.json
+
+          npm set init-author-name "Govcraft"
+          npm set init-author-email "roland@govcraft.ai"
+          npm set init-version ${{ inputs.name }}
+          npm set init-name "@govcraft/${{ inputs.name }}"
+          npm set init-os ${{ inputs.os }}
+          npm set init-cpu ${{ inputs.cpu }}
           
           # Publish the package
           npm publish --access public

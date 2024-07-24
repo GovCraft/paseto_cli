@@ -141,12 +141,20 @@ jobs:
         include:
           - ext: tar.gz
             artifact: paseto_cli-linux-x64
+            os: linux
+            cpu: x64
           - ext: tar.gz
             artifact: paseto_cli-darwin-x64
+            os: darwin
+            cpu: x64
           - ext: tar.gz
             artifact: paseto_cli-darwin-aarch64
+            os: darwin
+            cpu: aarch64
           - ext: zip
             artifact: paseto_cli-win32-x64
+            os: win32
+            cpu: x64
 
 
 #  publish-npm:
