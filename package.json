@@ -13,5 +13,8 @@
     "paseto_cli-darwin-x64": "1.0.0-alpha.3",
     "paseto_cli-darwin-aarch64": "1.0.0-alpha.3",
     "paseto_cli-windows-x64": "1.0.0-alpha.3"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }

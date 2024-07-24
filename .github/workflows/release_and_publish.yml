@@ -116,6 +116,8 @@ jobs:
           draft: false
           prerelease: true
           token: ${{ secrets.RELEASE_TOKEN }}
+          files: |
+            *.*
 
   publish-npm:
     needs: [ create-release, extract-version, update-package-json-version ]
