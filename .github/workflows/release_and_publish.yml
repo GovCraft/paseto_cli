@@ -109,10 +109,12 @@ jobs:
           echo "Debug: build_matrix = $build_matrix"
         shell: bash
 
-  build:
+  build-matrix:
     name: Build and Package
     needs: define-build-matrix
     runs-on: ubuntu-latest
+    outputs:
+      target-matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
       - name: Set up matrix
         id: set-matrix
@@ -124,10 +126,10 @@ jobs:
         run: echo '${{ steps.set-matrix.outputs.matrix }}'
 
   matrix-jobs:
-    needs: build
+    needs: build-matrix
     strategy:
       matrix:
-        include: ${{ fromJson(needs.build.outputs.matrix) }}
+        include: ${{ fromJson(needs.build-matrix.outputs.target-matrix) }}
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout code
