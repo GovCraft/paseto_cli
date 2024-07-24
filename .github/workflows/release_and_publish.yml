@@ -131,7 +131,7 @@ jobs:
     needs: [ create-release, extract-version, update-package-json-version ]
     with:
       version: ${{ needs.extract-version.outputs.cargo_version }}
-      name: ${{ matrix.artifact }}
+      name: ${{ matrix.name }}
       ext: ${{ matrix.ext }}
       os: ${{ matrix.os }}
       cpu: ${{ matrix.arch }}
