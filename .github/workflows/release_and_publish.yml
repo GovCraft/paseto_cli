@@ -87,6 +87,7 @@ jobs:
       - name: Upload Binary
         uses: actions/upload-artifact@v4
         with:
+          path: .
           name: ${{ env.filename }}
           compression-level: 9
 
