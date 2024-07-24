@@ -117,48 +117,67 @@ jobs:
           prerelease: true
           token: ${{ secrets.RELEASE_TOKEN }}
           files: |
-            *.*
+            paseto_cli-linux-x64.tar.gz
 
-  publish-npm:
+  npm-publish:
+    name: Publish to NPM
+    uses: ./.github/workflows/npm_publish.yml
     needs: [ create-release, extract-version, update-package-json-version ]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          registry-url: 'https://registry.npmjs.org'
-      - name: Download Artifacts
-        uses: actions/download-artifact@v4
-        with:
-          path: .
-      - name: Install dependencies
-        env:
-          BINARY_DISTRIBUTION_VERSION: ${{ needs.extract-version.outputs.cargo_version }}
-          CI: true
-        run: |
-          npm install
-          npm ci
-      - name: Publish Linux x64 Binary
-        run: |
-          # Create directories
-          mkdir -p paseto_cli-linux-x64/bin
-          
-          # Extract the tarball
-          tar -xzf paseto_cli-linux-x64.tar.gz/paseto_cli-linux-x64.tar.gz -C paseto_cli-linux-x64/bin
-          
-          # Change the package name in package.json to reflect this optional dependency package
-          sed -i 's|"name": "@govcraft/paseto_cli"|"name": "@govcraft/paseto_cli-linux-x64"|' package.json
-          
-          # Publish the package
-          npm publish
-          
-          # Update GitHub summary
-          echo "### Published **@govcraft/paseto_cli-linux-x64** to **NPM**" >> $GITHUB_STEP_SUMMARY
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+    with:
+      version: ${{ needs.extract-version.outputs.cargo_version }}
+      name: ${{ matrix.artifact }}
+      ext: ${{ matrix.ext }}
+    secrets:
+      token: ${{ secrets.RELEASE_TOKEN }}
+      npm_token: ${{ secrets.NPM_TOKEN }}
+    strategy:
+      matrix:
+        include:
+          - ext: tar.gz
+            artifact: paseto_cli-linux-x64
+
+
+#  publish-npm:
+#    needs: [ create-release, extract-version, update-package-json-version ]
+#    runs-on: ubuntu-latest
+#    steps:
+#      - uses: actions/checkout@v4
+#      - name: Setup Node.js
+#        uses: actions/setup-node@v4
+#        with:
+#          node-version: '20'
+#          registry-url: 'https://registry.npmjs.org'
+#      - name: Download Artifacts
+#        uses: actions/download-artifact@v4
+#        with:
+#          path: .
+#      - name: Install dependencies
+#        env:
+#          BINARY_DISTRIBUTION_VERSION: ${{ needs.extract-version.outputs.cargo_version }}
+#          CI: true
+#        run: |
+#          npm install
+#          npm ci
+#      - name: Publish Linux x64 Binary
+#        run: |
+#          # Create directories
+#          mkdir -p paseto_cli-linux-x64/bin
+#
+#          # Extract the tarball
+#          tar -xzf paseto_cli-linux-x64.tar.gz/paseto_cli-linux-x64.tar.gz -C paseto_cli-linux-x64/bin
+#
+#          # Change the package name in package.json to reflect this optional dependency package
+#          sed -i 's|"name": "@govcraft/paseto_cli"|"name": "@govcraft/paseto_cli-linux-x64"|' package.json
+#
+#          # Publish the package
+#          npm publish
+#
+#          # Update GitHub summary
+#          echo "### Published **@govcraft/paseto_cli-linux-x64** to **NPM**" >> $GITHUB_STEP_SUMMARY
+#        env:
+#          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 #      - name: Publish macOS x64 Binary
+
 #        run: |
 #          ls -la
 #          mkdir -p paseto_cli-darwin-x64/bin

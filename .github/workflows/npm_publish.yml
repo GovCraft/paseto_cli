@@ -1,0 +1,62 @@
+name: Publish to NPM
+
+on:
+  workflow_call:
+    inputs:
+      version:
+        required: true
+        type: string
+      name:
+        required: true
+        type: string
+      ext:
+        required: true
+        type: string
+    secrets:
+      npm_token:
+        required: true
+      token:
+        required: true
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          registry-url: 'https://registry.npmjs.org'
+      - name: Download Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: .
+      - name: Install dependencies
+        env:
+          BINARY_DISTRIBUTION_VERSION: ${{ inputs.version }}
+          CI: true
+        run: |
+          npm install
+          npm ci
+          echo "### Installed dependencies for **@govcraft/${{ inputs.name }}**" >> $GITHUB_STEP_SUMMARY
+      - name: Publish Binary
+        run: |
+          # Create directories
+          mkdir -p ${{ inputs.name }}/bin
+          
+          # Extract the tarball
+          tar -xzf ${{ inputs.name }}.${{ inputs.ext }}/${{ inputs.name }}.${{ inputs.ext }} -C ${{ inputs.name }}/bin
+          
+          # Change the package name in package.json to reflect this optional dependency package
+          sed -i 's|"name": "@govcraft/paseto_cli"|"name": "@govcraft/${{ inputs.name }}"|' package.json
+          
+          # Publish the package
+          npm publish
+          
+          # Update GitHub summary
+          echo "### Published **@govcraft/${{ inputs.name }}** to **NPM**" >> $GITHUB_STEP_SUMMARY
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.npm_token }}
