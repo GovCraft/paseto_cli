@@ -125,7 +125,7 @@ jobs:
       - name: Debug matrix
         run: echo '${{ steps.set-matrix.outputs.matrix }}'
 
-  matrix-jobs:
+  build-jobs:
     needs: build-matrix
     strategy:
       matrix:
@@ -177,7 +177,7 @@ jobs:
           path: ${{ matrix.os == 'ubuntu-latest' && 'paseto_cli-linux-x64.tar.gz' || matrix.os == 'macos-latest' && 'paseto_cli-darwin.tar.gz' || 'paseto_cli-win32-x64.zip' }}
           compression-level: 9
   create-release:
-    needs: [ build, extract-version ]
+    needs: [ build-jobs, extract-version ]
     runs-on: ubuntu-latest
     steps:
       - name: Fail if version is blank
@@ -207,7 +207,7 @@ jobs:
             *.zip
 
   publish-npm:
-    needs: [ create-release, extract-version, build ]
+    needs: [ create-release, extract-version, build-jobs ]
     runs-on: ubuntu-latest
     steps:
       - name: Fail if version is blank
