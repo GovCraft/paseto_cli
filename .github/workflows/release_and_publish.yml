@@ -140,12 +140,19 @@ jobs:
           npm ci
       - name: Publish Linux x64 Binary
         run: |
+          # Create directories
           mkdir -p paseto_cli-linux-x64/bin
+          
+          # Extract the tarball
           tar -xzf paseto_cli-linux-x64.tar.gz/paseto_cli-linux-x64.tar.gz -C paseto_cli-linux-x64/bin
+          
           # Change the package name in package.json to reflect this optional dependency package
-          sed -i 's/"name": "@govcraft/paseto_cli"/"name": "@govcraft/paseto_cli-linux-x64"/' package.json
-                                                    
+          sed -i 's|"name": "@govcraft/paseto_cli"|"name": "@govcraft/paseto_cli-linux-x64"|' package.json
+          
+          # Publish the package
           npm publish
+          
+          # Update GitHub summary
           echo "### Published **@govcraft/paseto_cli-linux-x64** to **NPM**" >> $GITHUB_STEP_SUMMARY
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
