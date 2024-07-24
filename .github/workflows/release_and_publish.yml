@@ -57,28 +57,28 @@ jobs:
             esac
           }
 
-          artifact_info=""
+          declare -A artifact_info
           for artifact_name in "paseto_cli-linux-x64" "paseto_cli-darwin" "paseto_cli-win32-x64"; do
             info=$(echo "$response" | jq -r --arg name "$artifact_name" '.artifacts[] | select(.name==$name)')
             if [ -n "$info" ]; then
               workflow_run_id=$(echo "$info" | jq -r '.workflow_run.id')
               echo "Artifact $artifact_name already exists from workflow id: $workflow_run_id."
-              artifact_info+=$(jq -n --arg os "$(get_os $artifact_name)" --arg artifact "$artifact_name" --arg run_id "$workflow_run_id" '{os: $os, exists: true, run_id: $run_id, artifact: $artifact}')
+              artifact_info[$artifact_name]=$(jq -n --arg os "$(get_os $artifact_name)" --arg artifact "$artifact_name" --arg run_id "$workflow_run_id" '{os: $os, exists: true, run_id: $run_id, artifact: $artifact}')
             else
               echo "Artifact $artifact_name does not exist."
-              artifact_info+=$(jq -n --arg os "$(get_os $artifact_name)" --arg artifact "$artifact_name" '{os: $os, exists: false, artifact: $artifact}')
+              artifact_info[$artifact_name]=$(jq -n --arg os "$(get_os $artifact_name)" --arg artifact "$artifact_name" '{os: $os, exists: false, artifact: $artifact}')
             fi
           done
 
-          linux_x64=$(echo "$artifact_info" | jq -r '.[0]')
-          darwin=$(echo "$artifact_info" | jq -r '.[1]')
-          win32_x64=$(echo "$artifact_info" | jq -r '.[2]')
+          linux_x64=${artifact_info["paseto_cli-linux-x64"]}
+          darwin=${artifact_info["paseto_cli-darwin"]}
+          win32_x64=${artifact_info["paseto_cli-win32-x64"]}
 
           build_matrix=$(jq -n --arg version "${{ needs.extract-version.outputs.cargo_version }}" --argjson targets "[${linux_x64},${darwin},${win32_x64}]" '{version: $version, target: $targets}')
 
           echo "build_matrix=$build_matrix" >> $GITHUB_OUTPUT
         shell: bash
-  
+
 
   build:
     name: Build and Package
