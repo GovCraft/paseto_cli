@@ -61,14 +61,14 @@ async function downloadBinaryFromNpm() {
     const tarballBuffer = zlib.unzipSync(tarballDownloadBuffer);
     fs.writeFileSync(
         fallbackBinaryPath,
-        extractFileFromTarball(tarballBuffer, `../package/bin/${binaryName}`),
+        extractFileFromTarball(tarballBuffer, `./package/bin/${binaryName}`),
         { mode: 0o755 }
     );
 }
 
 function isPlatformSpecificPackageInstalled() {
     try {
-        require.resolve(`../${platformSpecificPackageName}/bin/${binaryName}`);
+        require.resolve(`./${platformSpecificPackageName}/bin/${binaryName}`);
         return true;
     } catch (e) {
         return false;

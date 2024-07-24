@@ -5,8 +5,8 @@
     "paseto_cli": "bin/paseto_cli"
   },
   "scripts": {
-    "postinstall": "node ./scripts/install.js",
-    "postversion": "node ./scripts/update-optional-dependencies.js"
+    "postinstall": "node ./install.js",
+    "postversion": "node ./update-optional-dependencies.js"
   },
   "optionalDependencies": {
     "paseto_cli-linux-x64": "1.0.0-alpha.3",
