@@ -34,24 +34,25 @@ jobs:
             os: linux
             arch: x64
             ext: tar.gz
+            on: ubuntu-latest
             artifact: paseto_cli-linux-x64
-          - target: x86_64-apple-darwin
-            os: darwin
-            arch: x64
-            ext: tar.gz
-            artifact: paseto_cli-darwin-x64
-          - target: aarch64-apple-darwin
-            os: darwin
-            arch: arm64
-            ext: tar.gz
-            artifact: paseto_cli-darwin-aarch64
-          - target: x86_64-pc-windows-msvc
-            os: win32
-            arch: x64
-            ext: zip
-            artifact: paseto_cli-win32-x64
+#          - target: x86_64-apple-darwin
+#            os: darwin
+#            arch: x64
+#            ext: tar.gz
+#            artifact: paseto_cli-darwin-x64
+#          - target: aarch64-apple-darwin
+#            os: darwin
+#            arch: arm64
+#            ext: tar.gz
+#            artifact: paseto_cli-darwin-aarch64
+#          - target: x86_64-pc-windows-msvc
+#            os: win32
+#            arch: x64
+#            ext: zip
+#            artifact: paseto_cli-win32-x64
 
-    runs-on: ${{ matrix.os }}
+    runs-on: ${{ matrix.on }}
     env:
       filename: ${{ matrix.artifact }}.${{ matrix.ext }}
     steps:
@@ -149,30 +150,30 @@ jobs:
           npm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-      - name: Publish macOS x64 Binary
-        run: |
-          ls -la
-          mkdir -p paseto_cli-darwin-x64/bin
-          tar -xzf paseto_cli-darwin-x64.tar.gz -C paseto_cli-darwin-x64/bin
-          cd paseto_cli-darwin-x64
-          npm publish
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-      - name: Publish macOS arm64 Binary
-        run: |
-          ls -la
-          mkdir -p paseto_cli-darwin-arm64/bin
-          tar -xzf paseto_cli-darwin-arm64.tar.gz -C paseto_cli-darwin-arm64/bin
-          cd paseto_cli-darwin-arm64
-          npm publish
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-      - name: Publish Windows x64 Binary
-        run: |
-          dir
-          mkdir -p paseto_cli-windows-x64/bin
-          unzip paseto_cli-win32-x64.zip -d paseto_cli-windows-x64/bin
-          cd paseto_cli-windows-x64
-          npm publish
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+#      - name: Publish macOS x64 Binary
+#        run: |
+#          ls -la
+#          mkdir -p paseto_cli-darwin-x64/bin
+#          tar -xzf paseto_cli-darwin-x64.tar.gz -C paseto_cli-darwin-x64/bin
+#          cd paseto_cli-darwin-x64
+#          npm publish
+#        env:
+#          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+#      - name: Publish macOS arm64 Binary
+#        run: |
+#          ls -la
+#          mkdir -p paseto_cli-darwin-arm64/bin
+#          tar -xzf paseto_cli-darwin-arm64.tar.gz -C paseto_cli-darwin-arm64/bin
+#          cd paseto_cli-darwin-arm64
+#          npm publish
+#        env:
+#          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+#      - name: Publish Windows x64 Binary
+#        run: |
+#          dir
+#          mkdir -p paseto_cli-windows-x64/bin
+#          unzip paseto_cli-win32-x64.zip -d paseto_cli-windows-x64/bin
+#          cd paseto_cli-windows-x64
+#          npm publish
+#        env:
+#          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

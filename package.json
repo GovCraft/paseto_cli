@@ -5,11 +5,13 @@
     "paseto_cli": "bin/paseto_cli"
   },
   "scripts": {
-    "postinstall": "node ./install.js"
+    "postinstall": "node ./scripts/install.js",
+    "postversion": "node ./scripts/update-optional-dependencies.js"
   },
   "optionalDependencies": {
-    "paseto_cli-linux-x64": "1.0.0-alpha.2",
-    "paseto_cli-linux-arm": "1.0.0-alpha.2",
-    "paseto_cli-windows-x64": "1.0.0-alpha.2"
+    "paseto_cli-linux-x64": "1.0.0-alpha.3",
+    "paseto_cli-darwin-x64": "1.0.0-alpha.3",
+    "paseto_cli-darwin-aarch64": "1.0.0-alpha.3",
+    "paseto_cli-windows-x64": "1.0.0-alpha.3"
   }
 }

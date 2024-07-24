@@ -5,8 +5,9 @@ const https = require('https');
 
 const BINARY_DISTRIBUTION_PACKAGES = {
     'linux-x64': 'paseto_cli-linux-x64',
-    'linux-arm': 'paseto_cli-linux-arm',
-    'win32-x64': 'paseto_cli-windows-x64'
+    'darwin-x64': 'paseto_cli-darwin-x64',
+    'darwin-aarch64': 'paseto_cli-darwin-aarch64',
+    'win32-x64': 'paseto_cli-win32-x64'
 };
 
 const BINARY_DISTRIBUTION_VERSION = process.env.BINARY_DISTRIBUTION_VERSION || '1.0.0-alpha.2'; // Default to a version if not set
@@ -60,14 +61,14 @@ async function downloadBinaryFromNpm() {
     const tarballBuffer = zlib.unzipSync(tarballDownloadBuffer);
     fs.writeFileSync(
         fallbackBinaryPath,
-        extractFileFromTarball(tarballBuffer, `package/bin/${binaryName}`),
+        extractFileFromTarball(tarballBuffer, `../package/bin/${binaryName}`),
         { mode: 0o755 }
     );
 }
 
 function isPlatformSpecificPackageInstalled() {
     try {
-        require.resolve(`${platformSpecificPackageName}/bin/${binaryName}`);
+        require.resolve(`../${platformSpecificPackageName}/bin/${binaryName}`);
         return true;
     } catch (e) {
         return false;
