@@ -26,125 +26,40 @@ jobs:
           echo "### Release Build: v$version" >> $GITHUB_STEP_SUMMARY
           echo "cargo_version=$version" >> $GITHUB_OUTPUT
 
-  update-package-json-version:
-    name: Update package.json version
-    uses: ./.github/workflows/update_package_json_version.yml
-    needs: extract-version
-    with:
-      version: ${{ needs.extract-version.outputs.cargo_version }}
-    secrets:
-      token: ${{ secrets.RELEASE_TOKEN }}
-
-  build-matrix:
-    name: Define Build Matrix
-    runs-on: ubuntu-latest
-    needs: extract-version
-    outputs:
-      target-matrix: ${{ steps.set-matrix.outputs.target-matrix }}
-
-    steps:
-      - name: Set matrix
-        id: set-matrix
-        env:
-          version: ${{ needs.extract-version.outputs.cargo_version }}
-        run: |
-          echo $RELEASE_TOKEN
-          echo "### Checking for artifact existence" >> $GITHUB_STEP_SUMMARY
-          response=$(curl -s "https://api.github.com/repos/GovCraft/paseto_cli/actions/artifacts")
-          
-          
-          process_artifact() {
-            local artifact_name="$1"
-            local artifact_info
-            local workflow_run_id
-            local exists
-
-            artifact_info=$(echo "$response" | jq -r --arg name "$artifact_name" '
-            .artifacts // []
-            | map(select(.name == $name and (.expired == false or .expired == null) and (.expired_at == null or .expired_at == "")))
-            | sort_by(.created_at)
-            | reverse
-            | first // empty
-            ')
-
-            if [ -n "$artifact_info" ] && [ "$artifact_info" != "null" ]; then
-              workflow_run_id=$(echo "$artifact_info" | jq -r '.workflow_run.id')
-              echo "Artifact $artifact_name already exists from workflow id: $workflow_run_id."
-              exists="true"
-            else
-              echo "Artifact $artifact_name does not exist or has expired so using workflow_run_id ${{ github.run_id }}" >> $GITHUB_STEP_SUMMARY
-              workflow_run_id="${{ github.run_id }}"
-              exists="false"
-            fi
-
-            var_name=$(echo "$artifact_name" | tr '-' '_' | tr '.' '_'| cut -c1-13)
-            echo "Setting $var_name for $workflow_run_id"
-            eval "${var_name}_workflow_run_id=$workflow_run_id"
-            eval "${var_name}_exists=$exists"
-          }
-          
-          
-          win=$(echo "paseto_cli-win32-x64-v${{env.version}}")
-          linux=$(echo "paseto_cli-linux-x64-v${{env.version}}")
-          mac=$(echo "paseto_cli-darwin-v${{env.version}}")
-
-
-          for artifact_name in $win $linux $mac; do
-            process_artifact "$artifact_name"
-          done
-
-          echo "Results:"
-          for artifact_name in $win $linux $mac; do
-            var_name=$(echo "$artifact_name"  | tr '-' '_' | tr '.' '_'| cut -c1-13)
-            eval "echo ::info::\"$artifact_name - Exists: \${${var_name}_exists}, Workflow Run ID: \${${var_name}_workflow_run_id}\""
-            eval "echo \"$artifact_name - Exists: \${${var_name}_exists}, Workflow Run ID: \${${var_name}_workflow_run_id}\"" >> $GITHUB_STEP_SUMMARY
-          done
-          
-          var_win_name=$(echo "$win"  | tr '-' '_' | tr '.' '_'| cut -c1-13)
-          var_linux_name=$(echo "$linux"  | tr '-' '_' | tr '.' '_'| cut -c1-13)
-          var_mac_name=$(echo "$mac"  | tr '-' '_' | tr '.' '_'| cut -c1-13)
-          
-          echo $var_win_name
-          echo $var_linux_name
-          echo $var_mac_name
-          
-          eval "var_win_exists=\${${var_win_name}_exists}"
-          eval "var_linux_exists=\${${var_linux_name}_exists}"
-          eval "var_mac_exists=\${${var_mac_name}_exists}"
-          
-          matrix=$(jq -c -n \
-            --arg linux_exists ${var_linux_exists} \
-            --arg darwin_exists ${var_mac_exists} \
-            --arg win_exists ${var_win_exists} \
-            --arg win_artifact_name ${win}.zip \
-            --arg linux_artifact_name ${linux}.tar.gz \
-            --arg mac_artifact_name ${mac}.tar.gz \
-            '{
-              "include": [
-                {"os": "ubuntu-latest", "artifact_name": $linux_artifact_name, "exists": $linux_exists, "target": "x86_64-unknown-linux-gnu"},
-                {"os": "macos-latest", "artifact_name": $mac_artifact_name, "exists": $darwin_exists, "target": "x86_64-apple-darwin"},
-                {"os": "windows-latest", "artifact_name": $win_artifact_name, "exists": $win_exists, "target": "x86_64-pc-windows-msvc"}
-              ]
-            }')
-
-          echo "target-matrix=$matrix" >> $GITHUB_OUTPUT
-
-        shell: bash
 
   build-jobs:
-    needs: build-matrix
     strategy:
-      matrix: ${{ fromJson(needs.build-matrix.outputs.target-matrix) }}
+      matrix:
+        include:
+          - target: x86_64-unknown-linux-gnu
+            os: linux
+            arch: x64
+            ext: tar.gz
+            artifact: paseto_cli-linux-x64
+          - target: x86_64-apple-darwin
+            os: darwin
+            arch: x64
+            ext: tar.gz
+            artifact: paseto_cli-darwin-x64
+          - target: aarch64-apple-darwin
+            os: darwin
+            arch: arm64
+            ext: tar.gz
+            artifact: paseto_cli-darwin-aarch64
+          - target: x86_64-pc-windows-msvc
+            os: win32
+            arch: x64
+            ext: zip
+            artifact: paseto_cli-win32-x64
+
     runs-on: ${{ matrix.os }}
     env:
-      filename: ${{ matrix.artifact_name }}
+      filename: ${{ matrix.artifact }}.${{ matrix.ext }}
     steps:
       - name: Checkout code
-        if: matrix.exists == 'false'
         uses: actions/checkout@v4
 
       - name: Install Rust
-        if: matrix.exists == 'false'
         uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
@@ -152,37 +67,38 @@ jobs:
           override: true
 
       - name: Build
-        if: matrix.exists == 'false'
         uses: actions-rs/cargo@v1
         with:
           command: build
           args: --release --target ${{ matrix.target }}
       - name: Package Binary
-        if: matrix.exists == 'false'
         run: |
-          if [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
-            cd target/x86_64-unknown-linux-gnu/release
-            tar -czf paseto_cli-linux-x64.tar.gz paseto_cli
-            mv paseto_cli-linux-x64.tar.gz ../../../${{ env.filename }}
-          elif [[ "${{ matrix.os }}" == "macos-latest" ]]; then
-            cd target/x86_64-apple-darwin/release
-            tar -czf paseto_cli-darwin.tar.gz paseto_cli
-            mv paseto_cli-darwin.tar.gz ../../../${{ env.filename }}
-          elif [[ "${{ matrix.os }}" == "windows-latest" ]]; then
-            cd target/x86_64-pc-windows-msvc/release
-            7z a -r paseto_cli-win32-x64.zip paseto_cli.exe
-            powershell -command "Move-Item -Path paseto_cli-win32-x64.zip -Destination ../../../${{ env.filename }}"
+          cd target/${{ matrix.target }}/release
+          if [[ "${{ matrix.os }}" == "darwin" ]]; then
+            tar -czf $filename paseto_cli
+            mv $filename ../../../
+          elif [[ "${{ matrix.os }}" == "win32" ]]; then
+            7z a -r $filename paseto_cli.exe
+            powershell -command "Move-Item -Path paseto_cli-win32-x64.zip -Destination ../../../"
           fi
-          echo "### Artifact created: ${{ env.filename }}" >> $GITHUB_STEP_SUMMARY
+          echo "### Artifact **$filename** created for **${{ matrix.target }}**" >> $GITHUB_STEP_SUMMARY
         shell: bash
 
       - name: Upload Binary
-        if: matrix.exists == 'false'
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ env.filename }}
-          path: ${{ env.filename }}
+          name: ${{ matrix.target }}
+          path: $filename
           compression-level: 9
+
+  update-package-json-version:
+    name: Update package.json version
+    uses: ./.github/workflows/update_package_json_version.yml
+    needs: [ build-jobs, extract-version ]
+    with:
+      version: ${{ needs.extract-version.outputs.cargo_version }}
+    secrets:
+      token: ${{ secrets.RELEASE_TOKEN }}
 
   create-release:
     needs: [ build-jobs, extract-version, build-matrix ]
@@ -190,9 +106,6 @@ jobs:
     steps:
       - name: Download Artifacts
         uses: actions/download-artifact@v4
-        with:
-          run-id: ${{ needs.build.outputs.workflow_run_id }}
-          path: .
       - name: Create Release and Upload Release Assets
         uses: softprops/action-gh-release@v2
         env:
