@@ -111,11 +111,11 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout code
-        if: matrix.exists == 'false'
+        if: matrix.exists == false
         uses: actions/checkout@v4
 
       - name: Install Rust
-        if: matrix.exists == 'false'
+        if: matrix.exists == false
         uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
@@ -123,14 +123,14 @@ jobs:
           override: true
 
       - name: Build
-        if: matrix.exists == 'false'
+        if: matrix.exists == false
         uses: actions-rs/cargo@v1
         with:
           command: build
           args: --release --target ${{ matrix.os == 'ubuntu-latest' && 'x86_64-unknown-linux-gnu' || matrix.os == 'macos-latest' && 'x86_64-apple-darwin' || 'x86_64-pc-windows-msvc' }}
 
       - name: Package Binary
-        if: matrix.exists == 'false'
+        if: matrix.exists == false
         run: |
           if [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
             cd target/x86_64-unknown-linux-gnu/release
@@ -148,7 +148,7 @@ jobs:
         shell: bash
 
       - name: Upload Binary
-        if: matrix.exists == 'false'
+        if: matrix.exists == false
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.artifact }}
