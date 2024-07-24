@@ -119,6 +119,8 @@ jobs:
           draft: false
           prerelease: true
           token: ${{ secrets.RELEASE_TOKEN }}
+          merge-multiple: true
+          path: ./
           files: |
             paseto_cli-linux-x64.tar.gz
             paseto_cli-darwin-x64.tar.gz

@@ -39,7 +39,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           path: .
-      - name: Publish Binary
+      - name: Extract Binary
         run: |
           # Create directories
           mkdir -p bin
@@ -50,6 +50,8 @@ jobs:
           else
             tar -xzf ${{ inputs.name }}.${{ inputs.ext }}/${{ inputs.name }}.${{ inputs.ext }} -C bin
           fi
+      - name: Publish Binary
+        run: |
 
           npm set init-author-name "Govcraft"
           npm set init-author-email "roland@govcraft.ai"
