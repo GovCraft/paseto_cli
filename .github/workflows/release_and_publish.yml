@@ -40,23 +40,35 @@ jobs:
           echo "### Checking for artifact existance" >> $GITHUB_STEP_SUMMARY
           response=$(curl -s -H "Authorization: token ***" "https://api.github.com/repos/GovCraft/paseto_cli/actions/artifacts")
           
+          # Validate JSON response
+          if ! echo "$response" | jq -e . >/dev/null 2>&1; then
+          echo "Error: Invalid JSON response"
+          exit 1
+          fi
+          
+          # Check if 'artifacts' array exists and is not empty
+          if [ "$(echo "$response" | jq 'has("artifacts")')" != "true" ] || [ "$(echo "$response" | jq '.artifacts | length')" -eq 0 ]; then
+          echo "Error: No artifacts found in the response"
+          exit 1
+          fi
+          
           declare -A artifact_data
           
           for artifact_name in "paseto_cli-linux-x64" "paseto_cli-darwin" "paseto_cli-win32-x64"; do
           artifact_info=$(echo "$response" | jq -r --arg name "$artifact_name" '
           .artifacts
-          | map(select(.name == $name and .expired == false and .expired_at == null))
+          | map(select(.name == $name and (.expired == false or .expired == null) and (.expired_at == null or .expired_at == "")))
           | sort_by(.created_at)
           | reverse
-          | first
+          | first // empty
           ')
           
-          if [ "$artifact_info" != "null" ] && [ -n "$artifact_info" ]; then
+          if [ -n "$artifact_info" ] && [ "$artifact_info" != "null" ]; then
           workflow_run_id=$(echo "$artifact_info" | jq -r '.workflow_run.id')
           echo "Artifact $artifact_name already exists from workflow id: $workflow_run_id."
           exists="true"
           else
-          echo "Artifact $artifact_name does not exist."
+          echo "Artifact $artifact_name does not exist or has expired."
           workflow_run_id=""
           exists="false"
           fi
