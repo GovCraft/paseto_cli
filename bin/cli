@@ -29,9 +29,14 @@ function getBinaryPath() {
 const binaryPath = getBinaryPath();
 console.log(`Binary path to be executed: ${binaryPath}`);
 
-const child = childProcess.spawn(binaryPath, process.argv.slice(2), {
-    stdio: "inherit",
-    detached: true
+const args = process.argv.slice(2);
+if (args.length === 0) {
+    console.log("No arguments provided. Displaying help...");
+    args.push("--help");
+}
+
+const child = childProcess.spawn(binaryPath, args, {
+    stdio: ["inherit", "inherit", "inherit"]
 });
 
 // Log child process events for debugging
@@ -41,6 +46,3 @@ child.on('error', (err) => {
 child.on('exit', (code, signal) => {
     console.log(`Child process exited with code ${code} and signal ${signal}`);
 });
-
-// Detach the child process from the parent process
-// child.unref();
