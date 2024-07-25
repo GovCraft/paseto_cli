@@ -187,6 +187,6 @@ jobs:
           cp ./install.js dist
           cp -r bin dist
           cd dist
-          npm publish --access public --tag alpha.v${{ needs.extract-version.outputs.cargo_version }}"
+          npm publish --access public --tag alpha.v${{ needs.extract-version.outputs.cargo_version }}
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
