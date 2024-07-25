@@ -175,6 +175,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          depth: 2
       - name: Install Node.js
         uses: actions/setup-node@v4
         with:
