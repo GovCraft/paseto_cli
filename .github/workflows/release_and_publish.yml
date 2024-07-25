@@ -123,6 +123,10 @@ jobs:
           token: ${{ secrets.RELEASE_TOKEN }}
           fail_on_unmatched_files: true
           path: ./
+      - name: Debug
+        run: |
+          ls -la
+          echo "### Release Build: v${{ needs.extract-version.outputs.cargo_version }}" >> $GITHUB_STEP_SUMMARY
 
 
   npm-publish:
