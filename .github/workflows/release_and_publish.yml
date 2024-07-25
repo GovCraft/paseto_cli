@@ -107,7 +107,7 @@ jobs:
   npm-publish-dependencies:
     name: Publish to NPM
     uses: ./.github/workflows/npm_dependency_publish.yml
-    needs: [ extract-version, update-package-json-version ]
+    needs: [ extract-version, update-package-version ]
     with:
       version: ${{ needs.extract-version.outputs.cargo_version }}
       name: ${{ matrix.name }}
