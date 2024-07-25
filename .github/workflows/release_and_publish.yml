@@ -27,6 +27,7 @@ jobs:
           echo "cargo_version=$version" >> $GITHUB_OUTPUT
 
   build-jobs:
+    name: Build ${{ matrix.target }}
     strategy:
       matrix:
         include:
@@ -94,7 +95,7 @@ jobs:
           name: ${{ env.filename }}
           compression-level: 9
 
-  update-package-json-version:
+  update-package-version:
     name: Update package.json version
     uses: ./.github/workflows/update_package_json_version.yml
     needs: [ build-jobs, extract-version ]
@@ -137,6 +138,7 @@ jobs:
             cpu: x64
 
   create-release:
+    name: Create v${{ needs.extract-version.outputs.cargo_version }} Release
     needs: [ npm-publish-dependencies, extract-version ]
     runs-on: ubuntu-latest
     steps:
@@ -167,7 +169,7 @@ jobs:
           echo "### Release Build: v${{ needs.extract-version.outputs.cargo_version }}" >> $GITHUB_STEP_SUMMARY
 
   publish-cli:
-    name: Publish Primary Package to NPM
+    name: Publish paseto_cli to NPM
     needs: [ create-release ]
     runs-on: ubuntu-latest
     steps:
@@ -177,6 +179,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
+          registry-url: 'https://registry.npmjs.org'
       - name: Publish to NPM
         run: |
           mkdir -p dist
