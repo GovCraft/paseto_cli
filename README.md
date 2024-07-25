@@ -37,6 +37,7 @@ echo "your-32-byte-key-in-base64" | paseto_cli validate --token "v4.local.your-t
 - Supports multiple output formats: plain, pretty, and JSON
 - Handles relative time expressions (e.g., "2h", "1d")
 - Adheres to PASETO best practices
+- Implicit assertion and Footer support will be added before 1.0 release
 
 ## Table of Contents
 
