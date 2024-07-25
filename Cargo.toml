@@ -2,8 +2,18 @@
 name = "paseto_cli"
 version = "1.0.1-beta.1"
 edition = "2021"
-description = "A command-line tool for generating and validating PASETO v4.local tokens"
+description = "A command-line tool for generating and validating PASETO v4.local tokens with custom claims and multiple output formats"
 authors = ["Roland Rodriguez <roland@govcraft.ai>"]
+license = "GPL-3.0"
+repository = "https://github.com/GovCraft/paseto_cli"
+homepage = "https://github.com/GovCraft/paseto_cli"
+documentation = "https://github.com/GovCraft/paseto_cli#readme"
+readme = "README.md"
+keywords = ["paseto", "authentication", "security", "cli", "tokens"]
+categories = ["command-line-utilities", "cryptography"]
+
+[badges]
+maintenance = { status = "actively-developed" }
 
 [dependencies]
 rusty_paseto = { version = "0.7.1", features = ["v4_local"] }
