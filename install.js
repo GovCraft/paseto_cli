@@ -23,6 +23,7 @@ if (process.env.CI) {
 function makeRequest(url) {
     return new Promise((resolve, reject) => {
         https.get(url, (response) => {
+            console.log(`Using binary distribution version: ${BINARY_DISTRIBUTION_VERSION}`);
             console.log(`Attempting to download dependency from ${url}`);
             if (response.statusCode >= 200 && response.statusCode < 300) {
                 const chunks = [];

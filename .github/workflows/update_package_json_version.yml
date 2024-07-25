@@ -25,9 +25,9 @@ jobs:
           
           # Update the version and optional dependencies
           new_version="${{ inputs.version }}"
-          updated_package_json=$(echo "$package_json" | jq --arg new_version "$new_version" '.version = $new_version | .optionalDependencies."paseto_cli-linux-x64" = $new_version | .optionalDependencies."paseto_cli-darwin-x64" = $new_version | .optionalDependencies."paseto_cli-darwin-aarch64" = $new_version | .optionalDependencies."paseto_cli-windows-x64" = $new_version')
-          
-          # Save the updated package.json content
+          updated_package_json=$(echo "$package_json" | jq --arg new_version "$new_version" '.version = $new_version | .optionalDependencies."paseto_cli-linux-x64" = $new_version | .optionalDependencies."paseto_cli-darwin-x64" = $new_version | .optionalDependencies."paseto_cli-darwin-aarch64" = $new_version | .optionalDependencies."paseto_cli-windows-x64" = $new_version | .scripts.postinstall = "BINARY_DISTRIBUTION_VERSION=\($new_version) node ./install.js"')
+
+  # Save the updated package.json content
           echo "$updated_package_json" > package.json
           
           # Check if changes were made and commit them
