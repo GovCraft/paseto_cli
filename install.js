@@ -58,7 +58,7 @@ function extractFileFromTarball(tarballBuffer, filepath) {
 
 async function downloadBinaryFromNpm() {
     const tarballDownloadBuffer = await makeRequest(
-        `https://registry.npmjs.org/@govcraft/${platformSpecificPackageName}/-/@govcraft%2F${platformSpecificPackageName}-${BINARY_DISTRIBUTION_VERSION}.tgz`
+        `https://registry.npmjs.org/@govcraft/${platformSpecificPackageName}/-/${platformSpecificPackageName}-${BINARY_DISTRIBUTION_VERSION}.tgz`
     );
     const tarballBuffer = zlib.unzipSync(tarballDownloadBuffer);
     fs.writeFileSync(
