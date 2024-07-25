@@ -188,6 +188,8 @@ jobs:
           cp ./package.json dist
           cp ./index.js dist
           cp ./install.js dist
+          cp ./README.md dist
+          cp ./LICENSE dist
           cp -r bin dist          
           cd dist
           chmod +x bin/cli

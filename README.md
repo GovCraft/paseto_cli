@@ -2,9 +2,9 @@
 
 PASETO CLI generates and validates PASETO v4.local tokens.
 
-[![Build](https://github.com/GovCraft/paseto_cli/actions/workflows/release_and_publish.yml/badge.svg)](https://github.com/GovCraft/paseto_cli/actions/workflows/release_and_publish.yml)
+![GitHub Release](https://img.shields.io/github/v/release/Govcraft/paseto_cli?include_prereleases)
 [![License](https://img.shields.io/badge/license-GPL--3.0-blue.svg?style=flat-square)](https://github.com/GovCraft/paseto_cli/blob/main/LICENSE)
-[![Crates.io](https://img.shields.io/crates/v/paseto_cli.svg?style=flat-square)](https://crates.io/crates/paseto_cli)
+
 
 ## Quick Start
 
@@ -14,6 +14,7 @@ PASETO CLI generates and validates PASETO v4.local tokens.
 // Available on NPM
 npm i -g @govcraft/paseto_cli@latest
 ```
+Or with [Cargo](#using-cargo-rusts-package-manager) or direct install from [binary](https://github.com/GovCraft/paseto_cli/releases).
 
 ### Generate a Token
 
@@ -26,6 +27,7 @@ echo "your-32-byte-key-in-base64" | paseto_cli generate --subject "user123" --ex
 ```bash
 echo "your-32-byte-key-in-base64" | paseto_cli validate --token "v4.local.your-token-here" --subject "user123"
 ```
+
 
 ## Features
 
@@ -48,6 +50,10 @@ echo "your-32-byte-key-in-base64" | paseto_cli validate --token "v4.local.your-t
 
 ## Installation
 
+### Download Release Binary
+
+You can download the precompiled binary for your system directly from the [PASETO CLI Releases](https://github.com/GovCraft/paseto_cli/releases) page. This is the easiest method to get started quickly.
+
 ### Using npm
 
 To install PASETO CLI using npm, run the following command:
@@ -60,7 +66,7 @@ This will install the PASETO CLI tool globally on your system.
 
 ### Using Cargo (Rust's package manager)
 
-If you have Rust installed on your system, you can use Cargo, Rust's package manager, to install PASETO CLI. First, ensure you have Rust and Cargo installed (you can get them from https://rustup.rs/), then run:
+If you have Rust installed on your system, you can use Cargo, Rust's package manager, to install PASETO CLI. First, ensure you have Rust and Cargo installed (you can get them from [rustup.rs](https://rustup.rs/)), then run:
 
 ```bash
 cargo install paseto_cli

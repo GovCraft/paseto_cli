@@ -58,6 +58,21 @@ jobs:
           rm ${{ inputs.name }}.${{ inputs.ext }}
       - name: Publish Binary
         run: |
+          # Create the readme
+          echo "# PASETO CLI Optional Dependency
+  
+          This package is an optional dependency for the \`@govcraft/paseto_cli\` package and provides architecture-specific binaries.
+          
+          ## Installation
+          
+          To install the PASETO CLI, please use the main package:
+          
+          \`\`\`bash
+          npm i -g @govcraft/paseto_cli@latest
+          \`\`\`
+          
+          For more information and usage instructions, visit the [PASETO CLI repository](https://github.com/GovCraft/paseto_cli).
+          " > README.md
 
           # Custom package.json
           echo '{"name": "@govcraft/${{ inputs.name }}", "version": "${{ inputs.version }}", "os": ["${{ inputs.os }}"], "cpu": ["${{ inputs.cpu }}"], "author": {"name": "Govcraft", "email": "roland@govcraft.ai"}}' | jq . > package.json
