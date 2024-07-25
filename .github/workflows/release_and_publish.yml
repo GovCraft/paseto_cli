@@ -158,7 +158,7 @@ jobs:
           tag_name: v${{ needs.extract-version.outputs.cargo_version }}
           name: Release ${{ needs.extract-version.outputs.cargo_version }}
           draft: false
-          prerelease: true
+          prerelease: false
           token: ${{ secrets.RELEASE_TOKEN }}
           files: |
             ./*.tar.gz

@@ -3,7 +3,7 @@
 PASETO CLI generates and validates PASETO v4.local tokens.
 
 [![Release](https://github.com/GovCraft/paseto_cli/actions/workflows/release_and_publish.yml/badge.svg)](https://github.com/GovCraft/paseto_cli/actions/workflows/release_and_publish.yml)
-![GitHub Release](https://img.shields.io/github/v/release/Govcraft/paseto_cli?include_prereleases)
+![GitHub Release](https://img.shields.io/github/v/release/Govcraft/paseto_cli)
 [![License](https://img.shields.io/badge/license-GPL--3.0-blue.svg?style=flat-square)](https://github.com/GovCraft/paseto_cli/blob/main/LICENSE)
 
 
