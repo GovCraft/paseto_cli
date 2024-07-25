@@ -10,16 +10,16 @@ const BINARY_DISTRIBUTION_PACKAGES = {
     'win32-x64': 'paseto_cli-win32-x64'
 };
 
-const BINARY_DISTRIBUTION_VERSION = process.env.BINARY_DISTRIBUTION_VERSION || '1.0.0-alpha.2'; // Default to a version if not set
+const BINARY_DISTRIBUTION_VERSION = process.env.BINARY_DISTRIBUTION_VERSION || '1.0.0-alpha.11';
 const binaryName = process.platform === 'win32' ? 'paseto_cli.exe' : 'paseto_cli';
 const platformSpecificPackageName = BINARY_DISTRIBUTION_PACKAGES[`${process.platform}-${process.arch}`];
 const fallbackBinaryPath = path.join(__dirname, binaryName);
 
-// Skip download in CI environment
 if (process.env.CI) {
     console.log('CI environment detected. Skipping binary download.');
     process.exit(0);
 }
+
 function makeRequest(url) {
     return new Promise((resolve, reject) => {
         https.get(url, (response) => {
@@ -57,15 +57,20 @@ function extractFileFromTarball(tarballBuffer, filepath) {
 }
 
 async function downloadBinaryFromNpm() {
-    const tarballDownloadBuffer = await makeRequest(
-        `https://registry.npmjs.org/@govcraft/${platformSpecificPackageName}/-/${platformSpecificPackageName}-${BINARY_DISTRIBUTION_VERSION}.tgz`
-    );
-    const tarballBuffer = zlib.unzipSync(tarballDownloadBuffer);
-    fs.writeFileSync(
-        fallbackBinaryPath,
-        extractFileFromTarball(tarballBuffer, `./package/bin/${binaryName}`),
-        { mode: 0o755 }
-    );
+    try {
+        const tarballDownloadBuffer = await makeRequest(
+            `https://registry.npmjs.org/@govcraft/${platformSpecificPackageName}/-/${platformSpecificPackageName}-${BINARY_DISTRIBUTION_VERSION}.tgz`
+        );
+        const tarballBuffer = zlib.unzipSync(tarballDownloadBuffer);
+        fs.writeFileSync(
+            fallbackBinaryPath,
+            extractFileFromTarball(tarballBuffer, `./package/bin/${binaryName}`),
+            { mode: 0o755 }
+        );
+    } catch (error) {
+        console.error('Failed to download and install binary:', error);
+        process.exit(1);
+    }
 }
 
 function isPlatformSpecificPackageInstalled() {
@@ -85,5 +90,5 @@ if (!isPlatformSpecificPackageInstalled()) {
     console.log('Platform specific package not found. Will manually download binary.');
     downloadBinaryFromNpm();
 } else {
-    console.log('Platform specific package already installed. Will fall back to manually downloading binary.');
+    console.log('Platform specific package already installed.');
 }
