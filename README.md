@@ -2,7 +2,7 @@
 
 PASETO CLI generates and validates PASETO v4.local tokens.
 
-[![Build Status](https://img.shields.io/travis/Govcraft/paseto-cli/master.svg?style=flat-square)](https://travis-ci.org/Govcraft/paseto-cli)
+[![Build](https://github.com/GovCraft/paseto_cli/actions/workflows/release_and_publish.yml/badge.svg)](https://github.com/GovCraft/paseto_cli/actions/workflows/release_and_publish.yml)
 [![License](https://img.shields.io/badge/license-GPL--3.0-blue.svg?style=flat-square)](https://github.com/GovCraft/paseto_cli/blob/main/LICENSE)
 [![Crates.io](https://img.shields.io/crates/v/paseto_cli.svg?style=flat-square)](https://crates.io/crates/paseto_cli)
 
@@ -11,7 +11,8 @@ PASETO CLI generates and validates PASETO v4.local tokens.
 ### Installation
 
 ```bash
-cargo install paseto_cli
+// Available on NPM
+npm i -g @govcraft/paseto_cli@latest
 ```
 
 ### Generate a Token
@@ -52,7 +53,7 @@ echo "your-32-byte-key-in-base64" | paseto_cli validate --token "v4.local.your-t
 To install PASETO CLI using npm, run the following command:
 
 ```bash
-npm i @govcraft/paseto_cli
+npm i -g @govcraft/paseto_cli@latest
 ```
 
 This will install the PASETO CLI tool globally on your system.
