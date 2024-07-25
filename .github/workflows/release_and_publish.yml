@@ -175,8 +175,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          depth: 2
       - name: Install Node.js
         uses: actions/setup-node@v4
         with:
@@ -190,5 +188,7 @@ jobs:
           cp -r bin dist
           cd dist
           npm publish --access public --tag latest
+          echo "## Published paseto_cli to npm: v${{ needs.extract-version.outputs.cargo_version }}" >> $GITHUB_STEP_SUMMARY
+          cat ./package.json >> $GITHUB_STEP_SUMMARY
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
