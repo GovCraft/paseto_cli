@@ -25,7 +25,8 @@ function getBinaryPath() {
     return path.join(__dirname, "..", binaryName);
   }
 }
-
-childProcess.execFileSync(getBinaryPath(), process.argv.slice(2), {
+var binaryPath = getBinaryPath();
+console.log("binaryPath: ", binaryPath);
+childProcess.execFileSync(binaryPath, process.argv.slice(2), {
   stdio: "inherit",
 });
