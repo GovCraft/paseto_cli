@@ -29,8 +29,5 @@ function getBinaryPath() {
 
 const child = childProcess.spawn(getBinaryPath(), process.argv.slice(2), {
     stdio: ["inherit", "inherit", "inherit"],
-    detached: true
 });
 
-// Detach the child process from the parent process
-child.unref();
