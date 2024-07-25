@@ -1,6 +1,6 @@
 [package]
 name = "paseto_cli"
-version = "1.0.0-alpha.17"
+version = "1.0.0-alpha.18"
 edition = "2021"
 description = "A command-line tool for generating and validating PASETO v4.local tokens"
 authors = ["Roland Rodriguez <roland@govcraft.ai>"]
