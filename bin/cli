@@ -12,7 +12,8 @@ const BINARY_DISTRIBUTION_PACKAGES = {
 };
 
 // Windows binaries end with .exe so we need to special case them.
-const binaryName = process.platform === "win32-x64" ? "paseto_cli.exe" : "paseto_cli";
+const binaryName = process.platform === "win32" ? "paseto_cli.exe" : "paseto_cli";
+
 
 // Determine package name for this platform
 const platformSpecificPackageName = BINARY_DISTRIBUTION_PACKAGES[`${process.platform}-${process.arch}`];
