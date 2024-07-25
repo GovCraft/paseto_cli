@@ -109,6 +109,8 @@ jobs:
     steps:
       - name: Download Artifacts
         uses: actions/download-artifact@v4
+        with:
+          merge-multiple: true
       - name: Create Release and Upload Release Assets
         uses: softprops/action-gh-release@v2
         env:
@@ -119,7 +121,7 @@ jobs:
           draft: false
           prerelease: true
           token: ${{ secrets.RELEASE_TOKEN }}
-          merge-multiple: true
+          fail_on_unmatched_files: true
           path: ./
 
 
