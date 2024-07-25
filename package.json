@@ -8,10 +8,6 @@
     "postinstall": "BINARY_DISTRIBUTION_VERSION=1.0.0-alpha.7 node ./install.js"
   },
   "optionalDependencies": {
-    "paseto_cli-linux-x64": "1.0.0-alpha.5",
-    "paseto_cli-darwin-x64": "1.0.0-alpha.5",
-    "paseto_cli-darwin-aarch64": "1.0.0-alpha.5",
-    "paseto_cli-windows-x64": "1.0.0-alpha.5",
     "@govcraft/paseto_cli-linux-x64": "1.0.0-alpha.7",
     "@govcraft/paseto_cli-darwin-x64": "1.0.0-alpha.7",
     "@govcraft/paseto_cli-darwin-aarch64": "1.0.0-alpha.7",
