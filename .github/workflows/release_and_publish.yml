@@ -42,18 +42,18 @@ jobs:
             ext: tar.gz
             on: macos-latest
             artifact: paseto_cli-darwin-x64
-#          - target: aarch64-apple-darwin
-#            os: darwin
-#            arch: aarch64
-#            ext: tar.gz
-#            on: macos-latest
-#            artifact: paseto_cli-darwin-aarch64
-#          - target: x86_64-pc-windows-msvc
-#            os: win32
-#            arch: x64
-#            ext: zip
-#            on: windows-latest
-#            artifact: paseto_cli-win32-x64
+          - target: aarch64-apple-darwin
+            os: darwin
+            arch: aarch64
+            ext: tar.gz
+            on: macos-latest
+            artifact: paseto_cli-darwin-aarch64
+          - target: x86_64-pc-windows-msvc
+            os: win32
+            arch: x64
+            ext: zip
+            on: windows-latest
+            artifact: paseto_cli-win32-x64
 
     runs-on: ${{ matrix.on }}
     env:
@@ -104,7 +104,7 @@ jobs:
       token: ${{ secrets.RELEASE_TOKEN }}
 
   create-release:
-    needs: [ update-package-json-version, extract-version ]
+    needs: [ npm-publish, extract-version ]
     runs-on: ubuntu-latest
     steps:
       - name: Download Artifacts
@@ -137,13 +137,13 @@ jobs:
   npm-publish:
     name: Publish to NPM
     uses: ./.github/workflows/npm_dependency_publish.yml
-    needs: [ create-release, extract-version, update-package-json-version ]
+    needs: [ extract-version, update-package-json-version ]
     with:
       version: ${{ needs.extract-version.outputs.cargo_version }}
       name: ${{ matrix.name }}
       ext: ${{ matrix.ext }}
       os: ${{ matrix.os }}
-      cpu: ${{ matrix.arch }}
+      cpu: ${{ matrix.cpu }}
     secrets:
       token: ${{ secrets.RELEASE_TOKEN }}
       npm_token: ${{ secrets.NPM_TOKEN }}
@@ -158,14 +158,14 @@ jobs:
             name: paseto_cli-darwin-x64
             os: darwin
             cpu: x64
-#          - ext: tar.gz
-#            name: paseto_cli-darwin-aarch64
-#            os: darwin
-#            cpu: aarch64
-#          - ext: zip
-#            name: paseto_cli-win32-x64
-#            os: win32
-#            cpu: x64
+          - ext: tar.gz
+            name: paseto_cli-darwin-aarch64
+            os: darwin
+            cpu: aarch64
+          - ext: zip
+            name: paseto_cli-win32-x64
+            os: win32
+            cpu: x64
 
 
 #  publish-npm:
