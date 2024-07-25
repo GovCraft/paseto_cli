@@ -26,23 +26,11 @@ function getBinaryPath() {
         return path.join(__dirname, "..", binaryName);
     }
 }
-const binaryPath = getBinaryPath();
-console.log(`Binary path to be executed: ${binaryPath}`);
 
-const args = process.argv.slice(2);
-if (args.length === 0) {
-    console.log("No arguments provided. Displaying help...");
-    args.push("--help");
-}
-
-const child = childProcess.spawn(binaryPath, args, {
-    stdio: ["inherit", "inherit", "inherit"]
+const child = childProcess.spawn(getBinaryPath(), process.argv.slice(2), {
+    stdio: ["inherit", "inherit", "inherit"],
+    detached: true
 });
 
-// Log child process events for debugging
-child.on('error', (err) => {
-    console.error('Failed to start child process.', err);
-});
-child.on('exit', (code, signal) => {
-    console.log(`Child process exited with code ${code} and signal ${signal}`);
-});
+// Detach the child process from the parent process
+child.unref();
