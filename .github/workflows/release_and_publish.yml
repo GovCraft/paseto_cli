@@ -126,6 +126,8 @@ jobs:
           prerelease: true
           token: ${{ secrets.RELEASE_TOKEN }}
           fail_on_unmatched_files: true
+          files: |
+              ./*.tar.gz
       - name: Debug
         run: |
           ls -la
