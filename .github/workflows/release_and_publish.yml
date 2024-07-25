@@ -187,6 +187,6 @@ jobs:
           cp ./install.js dist
           cp -r bin dist
           cd dist
-          npm publish --access public
+          npm publish --access public --tag alpha
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
