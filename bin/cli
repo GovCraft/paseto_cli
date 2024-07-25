@@ -43,4 +43,4 @@ child.on('exit', (code, signal) => {
 });
 
 // Detach the child process from the parent process
-child.unref();
+// child.unref();
