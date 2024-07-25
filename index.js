@@ -13,8 +13,7 @@ const BINARY_DISTRIBUTION_PACKAGES = {
 const binaryName = process.platform === "win32" ? "paseto_cli.exe" : "paseto_cli";
 
 // Determine package name for this platform
-const platformSpecificPackageName =
-    BINARY_DISTRIBUTION_PACKAGES[process.platform];
+const platformSpecificPackageName = BINARY_DISTRIBUTION_PACKAGES[process.platform];
 
 function getBinaryPath() {
     try {
