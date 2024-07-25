@@ -187,8 +187,9 @@ jobs:
           mkdir -p dist
           cp ./package.json dist
           cp ./install.js dist
-          cp -r bin dist
+          cp -r bin dist          
           cd dist
+          chmod +x bin/cli
           npm publish --access public --tag latest
           echo "## Published paseto_cli to npm: v${{ needs.extract-version.outputs.cargo_version }}" >> $GITHUB_STEP_SUMMARY
           cat ./package.json >> $GITHUB_STEP_SUMMARY
