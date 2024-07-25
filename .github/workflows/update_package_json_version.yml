@@ -25,7 +25,7 @@ jobs:
           
           # Update the version and optional dependencies
           new_version="${{ inputs.version }}"
-          updated_package_json=$(echo "$package_json" | jq --arg new_version "$new_version" '.version = $new_version | .optionalDependencies."@govcraft/paseto_cli-linux-x64" = $new_version | .optionalDependencies."@govcraft/paseto_cli-darwin-x64" = $new_version | .optionalDependencies."@govcraft/paseto_cli-darwin-aarch64" = $new_version | .optionalDependencies."@govcraft/paseto_cli-win32-x64" = $new_version | .scripts.postinstall = "crossenv BINARY_DISTRIBUTION_VERSION=\($new_version) node ./install.js"')
+          updated_package_json=$(echo "$package_json" | jq --arg new_version "$new_version" '.version = $new_version | .optionalDependencies."@govcraft/paseto_cli-linux-x64" = $new_version | .optionalDependencies."@govcraft/paseto_cli-darwin-x64" = $new_version | .optionalDependencies."@govcraft/paseto_cli-darwin-aarch64" = $new_version | .optionalDependencies."@govcraft/paseto_cli-win32-x64" = $new_version | .scripts.postinstall = "cross-env BINARY_DISTRIBUTION_VERSION=\($new_version) node ./install.js"')
 
           # Save the updated package.json content
           echo "$updated_package_json" > package.json
