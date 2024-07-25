@@ -42,12 +42,12 @@ jobs:
             ext: tar.gz
             on: macos-latest
             artifact: paseto_cli-darwin-x64
-#          - target: aarch64-apple-darwin
-#            os: darwin
-#            arch: aarch64
-#            ext: tar.gz
-#            on: macos-latest
-#            artifact: paseto_cli-darwin-aarch64
+          - target: aarch64-apple-darwin
+            os: darwin
+            arch: aarch64
+            ext: tar.gz
+            on: macos-latest
+            artifact: paseto_cli-darwin-aarch64
 #          - target: x86_64-pc-windows-msvc
 #            os: win32
 #            arch: x64
@@ -158,10 +158,10 @@ jobs:
             name: paseto_cli-darwin-x64
             os: darwin
             cpu: x64
-#          - ext: tar.gz
-#            name: paseto_cli-darwin-aarch64
-#            os: darwin
-#            cpu: aarch64
+          - ext: tar.gz
+            name: paseto_cli-darwin-aarch64
+            os: darwin
+            cpu: aarch64
 #          - ext: zip
 #            name: paseto_cli-win32-x64
 #            os: win32
