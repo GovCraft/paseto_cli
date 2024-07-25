@@ -16,11 +16,10 @@ const BINARY_DISTRIBUTION_PACKAGES = {
 const BINARY_DISTRIBUTION_VERSION = process.env.BINARY_DISTRIBUTION_VERSION || '1.0.0-alpha.2'; // Default to a version if not set
 
 // Windows binaries end with .exe so we need to special case them.
-const binaryName = process.platform === "win32" ? "paseto_cli.exe" : "paseto_cli";
+const binaryName = process.platform === 'win32' ? 'paseto_cli.exe' : 'paseto_cli';
 
 // Determine package name for this platform
-const platformSpecificPackageName =
-    BINARY_DISTRIBUTION_PACKAGES[process.platform];
+const platformSpecificPackageName = BINARY_DISTRIBUTION_PACKAGES[`${process.platform}-${process.arch}`];
 
 // Compute the path we want to emit the fallback binary to
 const fallbackBinaryPath = path.join(__dirname, binaryName);
