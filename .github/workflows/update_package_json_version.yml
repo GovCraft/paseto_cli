@@ -1,4 +1,4 @@
-name: Update package.json Version
+name: Update Package Version
 
 on:
   workflow_call:
@@ -13,7 +13,7 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  update_and_commit_version:
+  update:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
