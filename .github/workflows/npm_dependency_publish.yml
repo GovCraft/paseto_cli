@@ -38,10 +38,10 @@ jobs:
       - name: Download Artifacts
         uses: actions/download-artifact@v4
         with:
-          name: ${{ inputs.name }}
+          name: ${{ inputs.name }}.${{ inputs.ext }}
       - name: Extract Binary
         run: |
-          # Create directories
+          # Create directory
           mkdir -p bin
           echo "### Dependency Assets Downloaded" >> $GITHUB_STEP_SUMMARY
           ls -la >> $GITHUB_STEP_SUMMARY
