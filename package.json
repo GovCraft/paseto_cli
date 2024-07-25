@@ -1,20 +1,20 @@
 {
   "name": "@govcraft/paseto_cli",
-  "version": "1.0.0-alpha.24",
+  "version": "1.0.0-alpha.25",
   "bin": {
     "paseto_cli": "bin/cli"
   },
   "scripts": {
-    "postinstall": "cross-env BINARY_DISTRIBUTION_VERSION=1.0.0-alpha.24 node ./install.js"
+    "postinstall": "cross-env BINARY_DISTRIBUTION_VERSION=1.0.0-alpha.25 node ./install.js"
   },
   "dependencies": {
     "cross-env": "^7.0.3"
   },
   "optionalDependencies": {
-    "@govcraft/paseto_cli-linux-x64": "1.0.0-alpha.24",
-    "@govcraft/paseto_cli-darwin-x64": "1.0.0-alpha.24",
-    "@govcraft/paseto_cli-darwin-aarch64": "1.0.0-alpha.24",
-    "@govcraft/paseto_cli-win32-x64": "1.0.0-alpha.24"
+    "@govcraft/paseto_cli-linux-x64": "1.0.0-alpha.25",
+    "@govcraft/paseto_cli-darwin-x64": "1.0.0-alpha.25",
+    "@govcraft/paseto_cli-darwin-aarch64": "1.0.0-alpha.25",
+    "@govcraft/paseto_cli-win32-x64": "1.0.0-alpha.25"
   },
   "publishConfig": {
     "access": "public"
