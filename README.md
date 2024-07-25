@@ -47,13 +47,29 @@ echo "your-32-byte-key-in-base64" | paseto_cli validate --token "v4.local.your-t
 
 ## Installation
 
-### Using Cargo
+### Using npm
+
+To install PASETO CLI using npm, run the following command:
+
+```bash
+npm i @govcraft/paseto_cli
+```
+
+This will install the PASETO CLI tool globally on your system.
+
+### Using Cargo (Rust's package manager)
+
+If you have Rust installed on your system, you can use Cargo, Rust's package manager, to install PASETO CLI. First, ensure you have Rust and Cargo installed (you can get them from https://rustup.rs/), then run:
 
 ```bash
 cargo install paseto_cli
 ```
 
+This command will download, compile, and install the PASETO CLI tool on your system.
+
 ### From Source
+
+To build from source:
 
 ```bash
 git clone https://github.com/Govcraft/paseto-cli.git
@@ -61,7 +77,7 @@ cd paseto-cli
 cargo build --release
 ```
 
-The binary is located at `target/release/paseto_cli`.
+The binary will be available at `target/release/paseto_cli`.
 
 ## Usage
 
