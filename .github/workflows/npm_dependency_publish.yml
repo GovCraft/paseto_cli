@@ -49,12 +49,13 @@ jobs:
           # Extract the binary
           if [[ "${{ inputs.ext }}" == "zip" ]]; then
             7z x ${{ inputs.name }}.${{ inputs.ext }} -obin
+            chmod +x bin/paseto_cli.exe
           else
             tar -xzf ${{ inputs.name }}.${{ inputs.ext }} -C bin
+            chmod +x bin/paseto_cli
           fi
           # Remove the archive
           rm ${{ inputs.name }}.${{ inputs.ext }}
-          chmod +x bin/paseto_cli
       - name: Publish Binary
         run: |
 
