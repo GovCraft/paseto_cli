@@ -54,7 +54,7 @@ jobs:
           fi
           # Remove the archive
           rm ${{ inputs.name }}.${{ inputs.ext }}
-
+          chmod +x bin/paseto_cli
       - name: Publish Binary
         run: |
 
