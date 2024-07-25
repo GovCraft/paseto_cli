@@ -29,4 +29,5 @@ function getBinaryPath() {
 
 childProcess.execFileSync(getBinaryPath(), process.argv.slice(2), {
   stdio: "inherit",
+  stdio: "ignore",
 });
