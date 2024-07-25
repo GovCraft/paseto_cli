@@ -2,7 +2,7 @@
   "name": "@govcraft/paseto_cli",
   "version": "1.0.0-alpha.18",
   "bin": {
-    "paseto_cli": "bin/paseto_cli"
+    "paseto_cli": "bin/cli"
   },
   "scripts": {
     "postinstall": "crossenv BINARY_DISTRIBUTION_VERSION=1.0.0-alpha.18 node ./install.js"
