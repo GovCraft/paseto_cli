@@ -158,7 +158,7 @@ jobs:
             name: paseto_cli-darwin-x64
             os: darwin
             cpu: x64
-          - ext: tar.gz
+#          - ext: tar.gz
 #            name: paseto_cli-darwin-aarch64
 #            os: darwin
 #            cpu: aarch64
