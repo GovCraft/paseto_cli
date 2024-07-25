@@ -36,12 +36,12 @@ jobs:
             ext: tar.gz
             on: ubuntu-latest
             artifact: paseto_cli-linux-x64
-#          - target: x86_64-apple-darwin
-#            os: darwin
-#            arch: x64
-#            ext: tar.gz
-#            on: macos-latest
-#            artifact: paseto_cli-darwin-x64
+          - target: x86_64-apple-darwin
+            os: darwin
+            arch: x64
+            ext: tar.gz
+            on: macos-latest
+            artifact: paseto_cli-darwin-x64
 #          - target: aarch64-apple-darwin
 #            os: darwin
 #            arch: aarch64
@@ -154,10 +154,10 @@ jobs:
             name: paseto_cli-linux-x64
             os: linux
             cpu: x64
-#          - ext: tar.gz
-#            name: paseto_cli-darwin-x64
-#            os: darwin
-#            cpu: x64
+          - ext: tar.gz
+            name: paseto_cli-darwin-x64
+            os: darwin
+            cpu: x64
 #          - ext: tar.gz
 #            name: paseto_cli-darwin-aarch64
 #            os: darwin

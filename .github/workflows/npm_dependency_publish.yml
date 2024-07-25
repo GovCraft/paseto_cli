@@ -52,6 +52,9 @@ jobs:
           else
             tar -xzf ${{ inputs.name }}.${{ inputs.ext }} -C bin
           fi
+          # Remove the archive
+          rm ${{ inputs.name }}.${{ inputs.ext }}
+
       - name: Publish Binary
         run: |
 
