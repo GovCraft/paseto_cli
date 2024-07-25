@@ -8,21 +8,10 @@
     "postinstall": "BINARY_DISTRIBUTION_VERSION=1.0.0-alpha.8 node ./install.js"
   },
   "optionalDependencies": {
-<<<<<<< HEAD
-    "@govcraft/paseto_cli-linux-x64": "1.0.0-alpha.7",
-    "@govcraft/paseto_cli-darwin-x64": "1.0.0-alpha.7",
-    "@govcraft/paseto_cli-darwin-aarch64": "1.0.0-alpha.7",
-    "@govcraft/paseto_cli-windows-x64": "1.0.0-alpha.7"
-=======
-    "paseto_cli-linux-x64": "1.0.0-alpha.5",
-    "paseto_cli-darwin-x64": "1.0.0-alpha.5",
-    "paseto_cli-darwin-aarch64": "1.0.0-alpha.5",
-    "paseto_cli-windows-x64": "1.0.0-alpha.5",
     "@govcraft/paseto_cli-linux-x64": "1.0.0-alpha.8",
     "@govcraft/paseto_cli-darwin-x64": "1.0.0-alpha.8",
     "@govcraft/paseto_cli-darwin-aarch64": "1.0.0-alpha.8",
     "@govcraft/paseto_cli-windows-x64": "1.0.0-alpha.8"
->>>>>>> 48d827a410d0d439a5b9069a4d2d14b55099b4e4
   },
   "publishConfig": {
     "access": "public"
